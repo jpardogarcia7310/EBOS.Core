@@ -6,15 +6,17 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{DB7E4B71-2FF9-4EDA-9B56-BE2E80F8FE32}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{5D48BD83-6E89-47DE-AC93-C4A2619DD457}"
-	ProjectSection(SolutionItems) = preProject
-		LICENSE = LICENSE
-		..\..\Images\Logo_EBOS_128.png = ..\..\Images\Logo_EBOS_128.png
-		README.md = README.md
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FAAE1604-B28B-4EA1-9328-ACD3C4AB3A26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBOS.Core", "sources\EBOS.Core\EBOS.Core.csproj", "{F80A72CC-9B1F-4ABA-ABFE-2F5A9B257E41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBOS.Core.Test", "tests\EBOS.Core.Test\EBOS.Core.Test.csproj", "{14AA5C88-41C4-4E69-9033-432F8974E6C0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementos de la solución", "Elementos de la solución", "{77E9C33F-F901-4913-97CB-0230A3C7D781}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,11 +28,19 @@ Global
 		{F80A72CC-9B1F-4ABA-ABFE-2F5A9B257E41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F80A72CC-9B1F-4ABA-ABFE-2F5A9B257E41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F80A72CC-9B1F-4ABA-ABFE-2F5A9B257E41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14AA5C88-41C4-4E69-9033-432F8974E6C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14AA5C88-41C4-4E69-9033-432F8974E6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14AA5C88-41C4-4E69-9033-432F8974E6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14AA5C88-41C4-4E69-9033-432F8974E6C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F80A72CC-9B1F-4ABA-ABFE-2F5A9B257E41} = {DB7E4B71-2FF9-4EDA-9B56-BE2E80F8FE32}
+		{14AA5C88-41C4-4E69-9033-432F8974E6C0} = {FAAE1604-B28B-4EA1-9328-ACD3C4AB3A26}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0790AEB7-BB65-4E45-8983-0255D31E9AFB}
 	EndGlobalSection
 EndGlobal

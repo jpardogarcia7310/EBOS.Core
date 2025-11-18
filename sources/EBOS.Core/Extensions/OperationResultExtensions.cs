@@ -1,60 +1,61 @@
-﻿namespace EBOS.Core.Extensions;
+﻿using EBOS.Core.Primitives;
+
+namespace EBOS.Core.Extensions;
 
 public static class OperationResultExtensions
 {
+    private const string OperationResultCannotBeNull = "operationResult cannot be null";
+
     public static OperationResult<TResult> AddResult<TResult>(this OperationResult<TResult> operationResult, TResult result)
     {
-        if (operationResult == null)
-        {
-            throw new ArgumentNullException(nameof(operationResult), "builderContext cannot be null");
-        }        
+        if (operationResult is null)
+            throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
+
         operationResult.Result = result;
-        
+
         return operationResult;
     }
 
-    public static OperationResult<TResult> AddResultWithError<TResult>(this OperationResult<TResult> operationResult, TResult result, 
-        string errorMessage, int errorCode, string exceptionMsg)
+    public static OperationResult<TResult> AddResultWithError<TResult>(this OperationResult<TResult> operationResult,
+        TResult result, string errorMessage, int errorCode, string exceptionMsg)
     {
-        if (operationResult == null)
-        {
-            throw new ArgumentNullException(nameof(operationResult), "builderContext cannot be null");
-        }
+        if (operationResult is null)
+            throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
+
         operationResult.Result = result;
         operationResult.Errors.Add(new ErrorResult(errorMessage, errorCode, exceptionMsg));
 
         return operationResult;
     }
 
-    public static OperationResult<TResult> AddResultWithError<TResult>(this OperationResult<TResult> operationResult, TResult result, ErrorResult errorResult)
+    public static OperationResult<TResult> AddResultWithError<TResult>(this OperationResult<TResult> operationResult,
+        TResult result, ErrorResult errorResult)
     {
-        if (operationResult == null)
-        {
-            throw new ArgumentNullException(nameof(operationResult), "builderContext cannot be null");
-        }
+        if (operationResult is null)
+            throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
+
         operationResult.Result = result;
         operationResult.Errors.Add(errorResult);
 
         return operationResult;
     }
 
-    public static OperationResult<TResult> AddError<TResult>(this OperationResult<TResult> operationResult, string errorMessage, int errorCode, string? exceptionMsg)
+    public static OperationResult<TResult> AddError<TResult>(this OperationResult<TResult> operationResult,
+        string errorMessage, int errorCode, string? exceptionMsg)
     {
-        if (operationResult == null)
-        {
-            throw new ArgumentNullException(nameof(operationResult), "builderContext cannot be null");
-        }
+        if (operationResult is null)
+            throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
+
         operationResult.Errors.Add(new ErrorResult(errorMessage, errorCode, exceptionMsg));
- 
+
         return operationResult;
     }
 
     public static OperationResult<TResult> AddError<TResult>(this OperationResult<TResult> operationResult, ErrorResult errorResult)
     {
-        if (operationResult == null)
-        {
-            throw new ArgumentNullException(nameof(operationResult), "builderContext cannot be null");
-        }
+        if (operationResult is null)
+            throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
+
         operationResult.Errors.Add(errorResult);
 
         return operationResult;
@@ -62,11 +63,13 @@ public static class OperationResultExtensions
 
     public static OperationResult<TResult> AddErrors<TResult>(this OperationResult<TResult> operationResult, IEnumerable<ErrorResult> validationErrors)
     {
-        if (operationResult == null)
-        {
-            throw new ArgumentNullException(nameof(operationResult), "builderContext cannot be null");
-        }
-        operationResult.Errors.AddRange(validationErrors);
+        if (operationResult is null)
+            throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
+        if (validationErrors is null)
+            return operationResult;
+
+        foreach (var error in validationErrors)
+            operationResult.Errors.Add(error);
 
         return operationResult;
     }

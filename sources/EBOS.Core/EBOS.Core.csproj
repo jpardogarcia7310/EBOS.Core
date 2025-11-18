@@ -15,11 +15,11 @@
 		<Title>EBOS Core</Title>
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
-		<PackageTags>Core; Kernel; Primitives</PackageTags>
-		<PackageReleaseNotes>Class library, which contains the utilities needed in the different WebAPIs and WebServices that make up the EBOS solution, to guarantee data confidentiality, access to the data, and common operability between them and with third parties.</PackageReleaseNotes>
+		<PackageTags>Core; Kernel; Primitives; Cryptography</PackageTags>
+		<PackageReleaseNotes>In this version 1.0.1, the CryptoEngine class was added, which allows cryptography to be performed.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<FileVersion>1.0.0</FileVersion>
+		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+		<FileVersion>$(VersionPrefix)</FileVersion>
 		<RepositoryUrl>https://github.com/SITECAV/EBOS.Core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseUrl></PackageLicenseUrl>
@@ -33,6 +33,21 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
+
+    <ItemGroup>
+      <None Include="..\..\..\..\Images\Logo_EBOS_128.png">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+      <None Include="..\..\LICENSE">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+      <None Include="..\..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="System.Runtime.Caching" Version="10.0.0" />
