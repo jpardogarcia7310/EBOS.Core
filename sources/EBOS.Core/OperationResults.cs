@@ -9,7 +9,7 @@ public class OperationResult<TResult>
         Errors = [];
     }
     public TResult Result { get; set; }
-    public List<ErrorResult> Errors { get; }
+    public ICollection<ErrorResult> Errors { get; }
     public bool HasErrors => Errors != null && Errors.Any();
 
 }

@@ -18,8 +18,8 @@
 		<PackageTags>Core; Kernel; Primitives; Cryptography</PackageTags>
 		<PackageReleaseNotes>In this version 1.0.1, the CryptoEngine class was added, which allows cryptography to be performed.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<AssemblyVersion>1.0.1</AssemblyVersion>
-		<FileVersion>1.0.1</FileVersion>
+		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+		<FileVersion>$(VersionPrefix)</FileVersion>
 		<RepositoryUrl>https://github.com/SITECAV/EBOS.Core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseUrl></PackageLicenseUrl>
