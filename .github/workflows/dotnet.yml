@@ -5,9 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]          # opcional, por si quieres CI también en push directo
   pull_request:
-    branches: [ "main" ]
+    branches: [ "develop" ]          # PR cuyo destino sea 'develop'
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
@@ -32,8 +32,10 @@ jobs:
         run: dotnet test --no-build --verbosity normal
 
   automerge:
-    # Solo en eventos de pull_request y mientras la PR esté abierta
-    if: github.event_name == 'pull_request' && github.event.pull_request.state == 'open'
+    # Solo en PR y solo si la PR está abierta y el destino es 'develop'
+    if: github.event_name == 'pull_request' && 
+        github.event.pull_request.state == 'open' &&
+        github.event.pull_request.base.ref == 'develop'
     needs: build
     runs-on: ubuntu-latest
 
@@ -49,7 +51,7 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
 
-            // 1. Comprobar que hay al menos una aprobación
+            // 1. Comprobar que hay al menos una revisión aprobada
             const { data: reviews } = await github.rest.pulls.listReviews({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -63,19 +65,19 @@ jobs:
               return;
             }
 
-            // 2. Hacer merge de la PR
+            // 2. Hacer merge de la PR hacia 'develop'
             await github.rest.pulls.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: pr.number,
-              merge_method: 'squash' // o 'merge' / 'rebase' según prefieras
+              merge_method: 'squash' // o 'merge' / 'rebase' si prefieres otro
             });
 
-            core.info('PR mezclada correctamente.');
+            core.info('PR mezclada correctamente en develop.');
 
             // 3. Borrar la rama origen de la PR
             const headRef = pr.head.ref; // rama origen
-            const baseRef = pr.base.ref; // rama destino
+            const baseRef = pr.base.ref; // rama destino (develop)
 
             if (headRef === baseRef) {
               core.info(`La rama de origen (${headRef}) es igual a la base, no se borra.`);
