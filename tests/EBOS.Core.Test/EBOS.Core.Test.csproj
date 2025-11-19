@@ -19,12 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BusinessErrors\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Primitives\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\sources\EBOS.Core\EBOS.Core.csproj" />
   </ItemGroup>
 
