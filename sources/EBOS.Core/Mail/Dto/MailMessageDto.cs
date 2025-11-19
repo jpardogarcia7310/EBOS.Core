@@ -2,12 +2,15 @@
 
 namespace EBOS.Core.Mail.Dto;
 
-public class MailMessageDto 
-{ 
-    public List<MailAddressDto> FromAddress { get; set; } 
-    public List<MailAddressDto> ToAddress { get; set; } 
-    public string Subject { get; set; } 
-    public string Message { get; set; } 
-    public string BodyType { get; set; } 
-    public MailAttachmentDto? MailAttachment { get; set; } 
+public class MailMessageDto
+{
+    // Colecciones solo lectura (la referencia), pero mutables por dentro.
+    public Collection<MailAddressDto> FromAddress { get; } = new();
+    public Collection<MailAddressDto> ToAddress { get; } = new();
+
+    public string Subject { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public string BodyType { get; set; } = string.Empty;
+
+    public MailAttachmentDto? MailAttachment { get; set; }
 }
