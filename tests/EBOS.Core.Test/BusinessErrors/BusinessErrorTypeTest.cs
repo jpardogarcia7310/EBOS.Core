@@ -49,7 +49,7 @@ public class BusinessErrorTypeTests
     [Fact]
     public void BusinessErrorType_Values_AreUnique()
     {
-        var values = Enum.GetValues(typeof(BusinessErrorType)).Cast<int>().ToArray();
+        var values = Enum.GetValues<BusinessErrorType>().Cast<int>().ToArray();
         var distinct = values.Distinct().ToArray();
 
         Assert.Equal(values.Length, distinct.Length);

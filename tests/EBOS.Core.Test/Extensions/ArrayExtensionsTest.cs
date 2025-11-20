@@ -112,6 +112,6 @@ public class ArrayExtensionsTest
         var result = target.Add(0, prepend: true);
 
         Assert.Equal(originalCopy, target);
-        Assert.Equal(new[] { 0, 1, 2, 3 }, result);
+        Assert.Equal([0, 1, 2, 3], result);
     }
 }

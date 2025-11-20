@@ -12,7 +12,7 @@ public class ErrorResultTests
         {
             var error = new ErrorResult("msg", 1, "ex");
 
-            Assert.IsAssignableFrom<IErrorResult>(error);
+            Assert.IsType<IErrorResult>(error, exactMatch: false);
         }
 
         #endregion
@@ -78,9 +78,10 @@ public class ErrorResultTests
     [Fact]
     public void Message_PropertyIsSettable()
     {
-        var error = new ErrorResult("initial", 1, null);
-
-        error.Message = "updated";
+        var error = new ErrorResult("initial", 1, null)
+        {
+            Message = "updated"
+        };
 
         Assert.Equal("updated", error.Message);
     }
@@ -88,9 +89,10 @@ public class ErrorResultTests
     [Fact]
     public void Code_PropertyIsSettable()
     {
-        var error = new ErrorResult("msg", 1, null);
-
-        error.Code = 999;
+        var error = new ErrorResult("msg", 1, null)
+        {
+            Code = 999
+        };
 
         Assert.Equal(999, error.Code);
     }
@@ -98,9 +100,10 @@ public class ErrorResultTests
     [Fact]
     public void ExceptionMsg_PropertyIsSettableToNonNull()
     {
-        var error = new ErrorResult("msg", 1, null);
-
-        error.ExceptionMsg = "new exception details";
+        var error = new ErrorResult("msg", 1, null)
+        {
+            ExceptionMsg = "new exception details"
+        };
 
         Assert.Equal("new exception details", error.ExceptionMsg);
     }
@@ -108,9 +111,10 @@ public class ErrorResultTests
     [Fact]
     public void ExceptionMsg_PropertyIsSettableToNull()
     {
-        var error = new ErrorResult("msg", 1, "ex");
-
-        error.ExceptionMsg = null;
+        var error = new ErrorResult("msg", 1, "ex")
+        {
+            ExceptionMsg = null
+        };
 
         Assert.Null(error.ExceptionMsg);
     }
@@ -122,11 +126,12 @@ public class ErrorResultTests
     [Fact]
     public void Properties_CanBeMutatedIndependently()
     {
-        var error = new ErrorResult("initial", 100, "ex1");
-
-        error.Message = "changed";
-        error.Code = 200;
-        error.ExceptionMsg = "ex2";
+        var error = new ErrorResult("initial", 100, "ex1")
+        {
+            Message = "changed",
+            Code = 200,
+            ExceptionMsg = "ex2"
+        };
 
         Assert.Equal("changed", error.Message);
         Assert.Equal(200, error.Code);

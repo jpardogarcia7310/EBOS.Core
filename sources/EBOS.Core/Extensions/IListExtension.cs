@@ -2,7 +2,7 @@
 
 public static class IListExtension
 {
-    public static bool IsNullOrEmpty<T>(this IList<T> collection)
+    public static bool IsNullOrEmpty<T>(this IList<T>? collection)
     {
         return collection == null || collection.Count == 0;
     }
