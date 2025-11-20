@@ -19,7 +19,7 @@ public class IListExtensionTests
     [Fact]
     public void IsNullOrEmpty_EmptyListOfValueType_ReturnsTrue()
     {
-        IList<int> collection = new List<int>();
+        IList<int> collection = [];
         var result = collection.IsNullOrEmpty();
 
         Assert.True(result);
@@ -28,7 +28,7 @@ public class IListExtensionTests
     [Fact]
     public void IsNullOrEmpty_EmptyListOfReferenceType_ReturnsTrue()
     {
-        IList<string> collection = new List<string>();
+        IList<string> collection = [];
         var result = collection.IsNullOrEmpty();
 
         Assert.True(result);
@@ -39,7 +39,7 @@ public class IListExtensionTests
     [Fact]
     public void IsNullOrEmpty_ListWithSingleItemValueType_ReturnsFalse()
     {
-        IList<int> collection = new List<int> { 1 };
+        IList<int> collection = [1];
         var result = collection.IsNullOrEmpty();
 
         Assert.False(result);
@@ -48,7 +48,7 @@ public class IListExtensionTests
     [Fact]
     public void IsNullOrEmpty_ListWithMultipleItemsValueType_ReturnsFalse()
     {
-        IList<int> collection = new List<int> { 1, 2, 3 };
+        IList<int> collection = [1, 2, 3];
         var result = collection.IsNullOrEmpty();
 
         Assert.False(result);
@@ -57,7 +57,7 @@ public class IListExtensionTests
     [Fact]
     public void IsNullOrEmpty_ListWithSingleItemReferenceType_ReturnsFalse()
     {
-        IList<string> collection = new List<string> { "item" };
+        IList<string> collection = ["item"];
         var result = collection.IsNullOrEmpty();
 
         Assert.False(result);
@@ -66,7 +66,7 @@ public class IListExtensionTests
     [Fact]
     public void IsNullOrEmpty_ListWithMultipleItemsReferenceType_ReturnsFalse()
     {
-        IList<string> collection = new List<string> { "a", "b" };
+        IList<string> collection = ["a", "b"];
         var result = collection.IsNullOrEmpty();
 
         Assert.False(result);
@@ -75,7 +75,7 @@ public class IListExtensionTests
     [Fact]
     public void IsNullOrEmpty_ListWithNullReferenceItemsButNonEmpty_ReturnsFalse()
     {
-        IList<string?> collection = new List<string?> { null, null };
+        IList<string?> collection = [null, null];
         var result = collection.IsNullOrEmpty();
 
         Assert.False(result);

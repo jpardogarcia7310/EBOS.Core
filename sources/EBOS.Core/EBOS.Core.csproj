@@ -16,31 +16,20 @@
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
 		<PackageTags>Core; Kernel; Primitives; Cryptography; BusinessErrors; Extensions</PackageTags>
-		<PackageReleaseNotes>The following classes are exposed:
+		<PackageReleaseNotes>First complete stable version with all the classes necessary to work in EBOS.CRM.
 
-OperationResults
-SingletonObjectCache
-BusinessError: 
-    BusinessErrorObject 
-    BusinessErrorType
-Crypto: 
-    CryptoEngine
-Extensions: 
-    ArrayExtensions 
-    DateExtensions 
-    IEnumerableExtensions 
-    IListExtension 
-    IntegerExtensions 
-    OperationResultExtensions 
-    StringExtensions
-Primitives: 
-    BaseEntity 
-    ErasedEntity 
-    ErrorResult
-Primitive Interfaces: 
-    IErrorResult 
-    IRepository 
-    ISoftDelete</PackageReleaseNotes>
+Includes:
+
+- BusinessErrors
+- Cryptography
+- Enumerates
+- Primitive Data Extensions
+- Email Sending
+- Validators
+- Primitives:
+    - Base Entity
+    - Deleteable Entity
+    - Error Base Class</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
 		<FileVersion>$(VersionPrefix)</FileVersion>
@@ -74,6 +63,8 @@ Primitive Interfaces:
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MailKit" Version="4.14.1" />
+      <PackageReference Include="MimeKit" Version="4.14.0" />
       <PackageReference Include="System.Runtime.Caching" Version="10.0.0" />
     </ItemGroup>
 
