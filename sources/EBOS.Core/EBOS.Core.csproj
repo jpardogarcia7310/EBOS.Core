@@ -16,31 +16,15 @@
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
 		<PackageTags>Core; Kernel; Primitives; Cryptography; BusinessErrors; Extensions</PackageTags>
-		<PackageReleaseNotes>The following classes are exposed:
+		<PackageReleaseNotes>1. The classes for sending emails have been created.
 
-OperationResults
-SingletonObjectCache
-BusinessError: 
-    BusinessErrorObject 
-    BusinessErrorType
-Crypto: 
-    CryptoEngine
-Extensions: 
-    ArrayExtensions 
-    DateExtensions 
-    IEnumerableExtensions 
-    IListExtension 
-    IntegerExtensions 
-    OperationResultExtensions 
-    StringExtensions
-Primitives: 
-    BaseEntity 
-    ErasedEntity 
-    ErrorResult
-Primitive Interfaces: 
-    IErrorResult 
-    IRepository 
-    ISoftDelete</PackageReleaseNotes>
+The SendMail, MailKitSmtpClientAdapter, and MailKitSmtpClientFactory classes were refactored to allow the SendMail class to be decoupled from the physical network during testing.
+
+2. The necessary validation classes for the EBOS solution have been created:
+
+- Bank Account Validator
+- SpanishIdentificationValidator
+- Email Validator</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
 		<FileVersion>$(VersionPrefix)</FileVersion>
