@@ -16,15 +16,20 @@
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
 		<PackageTags>Core; Kernel; Primitives; Cryptography; BusinessErrors; Extensions</PackageTags>
-		<PackageReleaseNotes>1. The classes for sending emails have been created.
+		<PackageReleaseNotes>First complete stable version with all the classes necessary to work in EBOS.CRM.
 
-The SendMail, MailKitSmtpClientAdapter, and MailKitSmtpClientFactory classes were refactored to allow the SendMail class to be decoupled from the physical network during testing.
+Includes:
 
-2. The necessary validation classes for the EBOS solution have been created:
-
-- Bank Account Validator
-- SpanishIdentificationValidator
-- Email Validator</PackageReleaseNotes>
+- BusinessErrors
+- Cryptography
+- Enumerates
+- Primitive Data Extensions
+- Email Sending
+- Validators
+- Primitives:
+    - Base Entity
+    - Deleteable Entity
+    - Error Base Class</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
 		<FileVersion>$(VersionPrefix)</FileVersion>
