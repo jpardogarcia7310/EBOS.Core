@@ -1,6 +1,6 @@
 ﻿namespace EBOS.Core.Primitives.Interfaces;
 
-public interface ISoftDelete
+public interface ISoftDeletable
 {
     bool Erased { get; set; }
 }

@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EBOS.Core.Primitives;
 
 /// <summary>
-/// Clase base práctica para entidades que requieren auditoría.
-/// Implementa ISoftAuditable; las entidades del dominio pueden heredar de esta clase.
+/// Clase base práctica para las entidades.
+/// Las entidades del dominio deben heredar de esta clase.
 /// </summary>
-public abstract class BaseEntity : ErasedEntity
+public abstract class BaseEntity 
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
