@@ -80,7 +80,7 @@ public class BaseEntityTests
     [Fact]
     public void BaseEntity_ShouldContainOnlyOneProperty_Id()
     {
-        var props = typeof(BaseEntity).GetProperties().Select(x => x.Name).ToList()
+        var props = typeof(BaseEntity).GetProperties().Select(x => x.Name).ToList();
 
         Assert.Single(props);
         Assert.Equal("Id", props[0]);
