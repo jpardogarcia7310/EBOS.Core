@@ -1,10 +1,10 @@
 namespace EBOS.Core.Primitives.Interfaces;
 
-public interface IRepository<T> where T : class
+public interface IRepository<TEntity> where TEntity : class
 {
-    Task AddAsync(T entity, CancellationToken cancellationToken);
-    void Update(T entity);
+    Task AddAsync(TEntity entity, CancellationToken cancellationToken);
+    void Update(TEntity entity);
 
-    Task<T?> GetByIdAsync(long id);
-    Task<IList<T>> GetAllAsync(CancellationToken cancellationToken);
+    Task<TEntity?> GetByIdAsync(long id);
+    Task<ICollection<TEntity>> GetAllAsync(CancellationToken cancellationToken);
 }
