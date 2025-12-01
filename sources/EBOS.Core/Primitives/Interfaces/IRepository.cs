@@ -5,7 +5,7 @@ public interface IRepository<TEntity> where TEntity : class
     #region Commands
     Task AddAsync(TEntity entity, CancellationToken cancellationToken);
     void Update(TEntity entity);
-    void DeletreAsync(TEntity entity, CancellationToken cancellationToken);
+    void DeleteAsync(TEntity entity, CancellationToken cancellationToken);
     #endregion
 
     #region Queries
