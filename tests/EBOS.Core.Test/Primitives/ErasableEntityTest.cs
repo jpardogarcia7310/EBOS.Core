@@ -6,7 +6,7 @@ namespace EBOS.Core.Test.Primitives;
 
 public class ErasbleEntityTests
 {
-    private class TestEntity : ErasbleEntity { }
+    private class TestEntity : ErasableEntity { }
 
     // ----- INSTANCIACIÓN -----
 
@@ -23,13 +23,13 @@ public class ErasbleEntityTests
     [Fact]
     public void ErasbleEntity_ShouldInheritFromBaseEntity()
     {
-        Assert.True(typeof(BaseEntity).IsAssignableFrom(typeof(ErasbleEntity)));
+        Assert.True(typeof(BaseEntity).IsAssignableFrom(typeof(ErasableEntity)));
     }
 
     [Fact]
     public void ErasbleEntity_ShouldImplementISoftDeletable()
     {
-        Assert.True(typeof(ISoftDeletable).IsAssignableFrom(typeof(ErasbleEntity)));
+        Assert.True(typeof(ISoftDeletable).IsAssignableFrom(typeof(ErasableEntity)));
     }
 
     // ----- PROPIEDAD ERASED -----
@@ -57,7 +57,7 @@ public class ErasbleEntityTests
     [Fact]
     public void Erased_ShouldHaveRequiredAttribute()
     {
-        var prop = typeof(ErasbleEntity).GetProperty(nameof(ErasbleEntity.Erased));
+        var prop = typeof(ErasableEntity).GetProperty(nameof(ErasableEntity.Erased));
         var attr = prop!.GetCustomAttributes(typeof(RequiredAttribute), true).FirstOrDefault();
 
         Assert.NotNull(attr);
@@ -94,7 +94,7 @@ public class ErasbleEntityTests
     [Fact]
     public void ErasbleEntity_ShouldOnlyContainIdAndErased()
     {
-        var props = typeof(ErasbleEntity).GetProperties().Select(x => x.Name).ToList();
+        var props = typeof(ErasableEntity).GetProperties().Select(x => x.Name).ToList();
 
         Assert.Contains("Id", props);
         Assert.Contains("Erased", props);
