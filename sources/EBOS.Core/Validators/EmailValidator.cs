@@ -1,26 +1,26 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace EBOS.Core.Validators;
 
-public static class EmailValidator
+public static partial class EmailValidator
 {
-    private static readonly Regex ValidEmailRegex = CreateValidEmailRegex();
+    private static readonly Regex SimpleDomainRegex =
+        DomainRegEx();
 
-    public static bool IsValidEmail(string emailAddress)
+    public static bool IsValidEmail(string? emailAddress)
     {
         if (string.IsNullOrWhiteSpace(emailAddress))
             return false;
 
-        return ValidEmailRegex.IsMatch(emailAddress);
+        var trimmed = emailAddress.Trim();
+
+        if (!MailAddress.TryCreate(trimmed, out _))
+            return false;
+
+        return SimpleDomainRegex.IsMatch(trimmed);
     }
 
-    private static Regex CreateValidEmailRegex()
-    {
-        const string validEmailPattern =
-            @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" +
-            @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" +
-            @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
-
-        return new Regex(validEmailPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    }
+    [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled, "es-ES")]
+    private static partial Regex DomainRegEx();
 }

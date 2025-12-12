@@ -2,6 +2,10 @@
 
 namespace EBOS.Core.Mail.Dto;
 
+/// <summary>
+/// DTO mínimo para representar un mensaje de correo.
+/// Ajusta o amplía según tus necesidades reales.
+/// </summary>
 public class MailMessageDto
 {
     // Colecciones solo lectura (la referencia), pero mutables por dentro.

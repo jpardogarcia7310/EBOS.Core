@@ -2,31 +2,32 @@
 
     <PropertyGroup>
 		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<AnalysisLevel>6.0-all</AnalysisLevel>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-		<AnalysisLevel>6.0-all</AnalysisLevel>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+			
 		<Title>EBOS Core</Title>
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
 		<PackageTags>Core; Kernel; Primitives; Cryptography; BusinessErrors; Extensions</PackageTags>
 		<PackageReleaseNotes>CancellationToken is added in the EndTransaction method of the UnitOfWork interface.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		
 		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
 		<FileVersion>$(VersionPrefix)</FileVersion>
+		
 		<RepositoryUrl>https://github.com/SITECAV/EBOS.Core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageLicenseUrl></PackageLicenseUrl>
+		
 		<Description>Class library, which contains the utilities needed in the different WebAPIs and WebServices that make up the EBOS solution, to guarantee data confidentiality, access to the data, and common operability between them and with third parties.</Description>
 		<PackageId>EBOS.Core</PackageId>
 		<PackageIcon>Logo_EBOS_128.png</PackageIcon>
+		
 		<PackageOutputPath>$(SolutionDir)NuGet</PackageOutputPath>
+		
 		<IncludeSymbols>True</IncludeSymbols>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -51,11 +52,14 @@
 
     <ItemGroup>
       <PackageReference Include="MailKit" Version="4.14.1" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
       <PackageReference Include="MimeKit" Version="4.14.0" />
 	</ItemGroup>
+	
 	<ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
 	  <PackageReference Include="System.Runtime.Caching" Version="8.0.1" />
     </ItemGroup>
+	
 	<ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
 		<PackageReference Include="System.Runtime.Caching" Version="10.0.0" />
 	</ItemGroup>
@@ -63,5 +67,4 @@
 	<ItemGroup>
       <Folder Include="Configurations\" />
     </ItemGroup>
-
 </Project>

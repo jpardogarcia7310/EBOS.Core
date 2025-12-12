@@ -23,7 +23,7 @@ public static class OperationResultExtensions
             throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
 
         operationResult.Result = result;
-        operationResult.Errors.Add(new ErrorResult(errorMessage, errorCode, exceptionMsg));
+        operationResult.AddError(new ErrorResult(errorMessage, errorCode, exceptionMsg));
 
         return operationResult;
     }
@@ -35,7 +35,7 @@ public static class OperationResultExtensions
             throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
 
         operationResult.Result = result;
-        operationResult.Errors.Add(errorResult);
+        operationResult.AddError(errorResult);
 
         return operationResult;
     }
@@ -46,7 +46,7 @@ public static class OperationResultExtensions
         if (operationResult is null)
             throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
 
-        operationResult.Errors.Add(new ErrorResult(errorMessage, errorCode, exceptionMsg));
+        operationResult.AddError(new ErrorResult(errorMessage, errorCode, exceptionMsg));
 
         return operationResult;
     }
@@ -56,7 +56,7 @@ public static class OperationResultExtensions
         if (operationResult is null)
             throw new ArgumentNullException(nameof(operationResult), OperationResultCannotBeNull);
 
-        operationResult.Errors.Add(errorResult);
+        operationResult.AddError(errorResult);
 
         return operationResult;
     }
@@ -69,7 +69,7 @@ public static class OperationResultExtensions
             return operationResult;
 
         foreach (var error in validationErrors)
-            operationResult.Errors.Add(error);
+            operationResult.AddError(error);
 
         return operationResult;
     }

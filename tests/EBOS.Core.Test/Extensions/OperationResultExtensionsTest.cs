@@ -5,309 +5,180 @@ namespace EBOS.Core.Test.Extensions;
 
 public class OperationResultExtensionsTests
 {
-    #region Helpers
-    private static OperationResult<string> CreateEmptyStringResult() => new();
-
-    private static OperationResult<int> CreateEmptyIntResult() => new();
-    #endregion
-
-    #region AddResult
     [Fact]
-    public void AddResult_NullOperationResult_ThrowsArgumentNullException()
+    public void AddResult_ThrowsArgumentNullException_WhenOperationResultIsNull()
     {
-        OperationResult<string>? operationResult = null;
-        var ex = Assert.Throws<ArgumentNullException>(() =>
-            OperationResultExtensions.AddResult(operationResult!, "value"));
-
+        OperationResult<int>? op = null;
+        var ex = Assert.Throws<ArgumentNullException>(() => OperationResultExtensions.AddResult(op!, 5));
         Assert.Equal("operationResult", ex.ParamName);
         Assert.Contains("operationResult cannot be null", ex.Message);
     }
 
     [Fact]
-    public void AddResult_SetsResultAndReturnsSameInstance()
+    public void AddResult_SetsResult_AndReturnsSameInstance()
     {
-        var operationResult = CreateEmptyStringResult();
-        var returned = operationResult.AddResult("test");
-
-        Assert.Same(operationResult, returned);
-        Assert.Equal("test", operationResult.Result);
+        var op = new OperationResult<string>();
+        var returned = OperationResultExtensions.AddResult(op, "hello");
+        Assert.Same(op, returned);
+        Assert.Equal("hello", op.Result);
     }
 
     [Fact]
-    public void AddResult_DoesNotModifyExistingErrors()
+    public void AddResultWithError_ThrowsArgumentNullException_WhenOperationResultIsNull()
     {
-        var operationResult = CreateEmptyStringResult();
-
-        operationResult.Errors.Add(new ErrorResult("e1", 1, "ex"));
-        operationResult.AddResult("updated");
-
-        Assert.Equal("updated", operationResult.Result);
-        Assert.Single(operationResult.Errors);
-    }
-    #endregion
-
-    #region AddResultWithError (message, code, exceptionMsg)
-    [Fact]
-    public void AddResultWithError_Params_NullOperationResult_ThrowsArgumentNullException()
-    {
-        OperationResult<string>? operationResult = null;
+        OperationResult<int>? op = null;
         var ex = Assert.Throws<ArgumentNullException>(() =>
-            OperationResultExtensions.AddResultWithError(operationResult!, "value", "error", 1, "ex"));
-
+            OperationResultExtensions.AddResultWithError(op!, 1, "err", 10, "ex"));
         Assert.Equal("operationResult", ex.ParamName);
         Assert.Contains("operationResult cannot be null", ex.Message);
     }
 
     [Fact]
-    public void AddResultWithError_Params_SetsResultAndAddsOneError()
+    public void AddResultWithError_AddsErrorAndSetsResult_WhenCalledWithComponents()
     {
-        var operationResult = CreateEmptyStringResult();
-        var returned = operationResult.AddResultWithError("value", "error message", 100, "exception");
-
-        Assert.Same(operationResult, returned);
-        Assert.Equal("value", operationResult.Result);
-        Assert.Single(operationResult.Errors);
-        Assert.NotNull(operationResult.Errors.First()); // un ErrorResult cualquiera
+        var op = new OperationResult<int>();
+        var returned = OperationResultExtensions.AddResultWithError(op, 42, "failure", 99, "stack");
+        Assert.Same(op, returned);
+        Assert.Equal(42, op.Result);
+        Assert.True(op.HasErrors);
+        var err = op.Errors.Single();
+        Assert.Equal(99, err.Code);
+        Assert.Equal("failure", err.Message);
+        Assert.Equal("stack", err.ExceptionMsg);
     }
 
     [Fact]
-    public void AddResultWithError_Params_AppendsErrorToExistingErrors()
+    public void AddResultWithError_WithErrorResult_AddsProvidedErrorAndSetsResult()
     {
-        var operationResult = CreateEmptyStringResult();
-
-        operationResult.Errors.Add(new ErrorResult("existing", 1, "ex1"));
-        operationResult.AddResultWithError("value", "new error", 2, "ex2");
-
-        Assert.Equal("value", operationResult.Result);
-        Assert.Equal(2, operationResult.Errors.Count);
-    }
-    #endregion
-
-    #region AddResultWithError (ErrorResult)
-    [Fact]
-    public void AddResultWithError_ErrorResult_NullOperationResult_ThrowsArgumentNullException()
-    {
-        OperationResult<int>? operationResult = null;
-        var errorResult = new ErrorResult("error", 1, "ex");
-        var ex = Assert.Throws<ArgumentNullException>(() =>
-            OperationResultExtensions.AddResultWithError(operationResult!, 10, errorResult));
-
-        Assert.Equal("operationResult", ex.ParamName);
-        Assert.Contains("operationResult cannot be null", ex.Message);
+        var op = new OperationResult<string>();
+        var error = new ErrorResult("boom", 7, "ex");
+        var returned = OperationResultExtensions.AddResultWithError(op, "ok", error);
+        Assert.Same(op, returned);
+        Assert.Equal("ok", op.Result);
+        Assert.True(op.HasErrors);
+        var err = op.Errors.Single();
+        Assert.Equal(7, err.Code);
+        Assert.Equal("boom", err.Message);
+        Assert.Equal("ex", err.ExceptionMsg);
     }
 
     [Fact]
-    public void AddResultWithError_ErrorResult_SetsResultAndAddsGivenErrorInstance()
+    public void AddResultWithError_WithNullErrorResult_BubblesArgumentNullException()
     {
-        var operationResult = CreateEmptyIntResult();
-        var error = new ErrorResult("error", 1, "ex");
-
-        var returned = operationResult.AddResultWithError(42, error);
-
-        Assert.Same(operationResult, returned);
-        Assert.Equal(42, operationResult.Result);
-        Assert.Single(operationResult.Errors);
-        Assert.Same(error, operationResult.Errors.First());
-    }
-
-    [Fact]
-    public void AddResultWithError_ErrorResult_AllowsNullErrorToBeAdded()
-    {
-        var operationResult = CreateEmptyIntResult();
+        var op = new OperationResult<string>();
         ErrorResult? error = null;
-
-        operationResult.AddResultWithError(1, error!);
-
-        Assert.Equal(1, operationResult.Result);
-        Assert.Single(operationResult.Errors);
-        Assert.Null(operationResult.Errors.First());
+        var ex = Assert.Throws<ArgumentNullException>(() => OperationResultExtensions.AddResultWithError(op, "ok", error!));
+        // The ArgumentNullException originates from OperationResult.AddError, param name is "error"
+        Assert.Equal("error", ex.ParamName);
     }
-    #endregion
 
-    #region AddError (message, code, exceptionMsg)
     [Fact]
-    public void AddError_Params_NullOperationResult_ThrowsArgumentNullException()
+    public void AddError_ThrowsArgumentNullException_WhenOperationResultIsNull()
     {
-        OperationResult<string>? operationResult = null;
-        var ex = Assert.Throws<ArgumentNullException>(() =>
-            OperationResultExtensions.AddError(operationResult!, "error", 5, "ex"));
-
+        OperationResult<int>? op = null;
+        var ex = Assert.Throws<ArgumentNullException>(() => OperationResultExtensions.AddError(op!, "m", 1, null));
         Assert.Equal("operationResult", ex.ParamName);
         Assert.Contains("operationResult cannot be null", ex.Message);
     }
 
     [Fact]
-    public void AddError_Params_AddsSingleError_AndDoesNotTouchResult()
+    public void AddError_ByComponents_AddsErrorAndReturnsSameInstance()
     {
-        var operationResult = CreateEmptyStringResult();
-    
-        operationResult.Result = "original";
-
-        var returned = operationResult.AddError("error message", 10, "exception");
-
-        Assert.Same(operationResult, returned);
-        Assert.Equal("original", operationResult.Result);
-        Assert.Single(operationResult.Errors);
-        Assert.NotNull(operationResult.Errors.First());
+        var op = new OperationResult<object>();
+        var returned = OperationResultExtensions.AddError(op, "msg", 11, "ex");
+        Assert.Same(op, returned);
+        Assert.True(op.HasErrors);
+        var e = op.Errors.Single();
+        Assert.Equal(11, e.Code);
+        Assert.Equal("msg", e.Message);
+        Assert.Equal("ex", e.ExceptionMsg);
     }
 
     [Fact]
-    public void AddError_Params_AppendsToExistingErrors()
+    public void AddError_ByObject_AddsErrorAndReturnsSameInstance()
     {
-        var operationResult = CreateEmptyStringResult();
-
-        operationResult.Errors.Add(new ErrorResult("e1", 1, "ex1"));
-        operationResult.AddError("e2", 2, "ex2");
-
-        Assert.Equal(2, operationResult.Errors.Count);
+        var op = new OperationResult<object>();
+        var error = new ErrorResult("x", 2, null);
+        var returned = OperationResultExtensions.AddError(op, error);
+        Assert.Same(op, returned);
+        Assert.True(op.HasErrors);
+        var e = op.Errors.Single();
+        Assert.Equal(2, e.Code);
+        Assert.Equal("x", e.Message);
+        Assert.Null(e.ExceptionMsg);
     }
 
     [Fact]
-    public void AddError_Params_AllowsNullExceptionMessage()
+    public void AddError_WithNullErrorResult_BubblesArgumentNullException()
     {
-        var operationResult = CreateEmptyStringResult();
-        var returned = operationResult.AddError("error", 1, null);
-
-        Assert.Same(operationResult, returned);
-        Assert.Single(operationResult.Errors);
-        // aquí solo verificamos que hay un error añadido; los detalles internos son de ErrorResult
-    }
-    #endregion
-
-    #region AddError (ErrorResult)
-    [Fact]
-    public void AddError_ErrorResult_NullOperationResult_ThrowsArgumentNullException()
-    {
-        OperationResult<string>? operationResult = null;
-        var error = new ErrorResult("error", 1, "ex");
-        var ex = Assert.Throws<ArgumentNullException>(() =>
-            OperationResultExtensions.AddError(operationResult!, error));
-
-        Assert.Equal("operationResult", ex.ParamName);
-        Assert.Contains("operationResult cannot be null", ex.Message);
-    }
-
-    [Fact]
-    public void AddError_ErrorResult_AddsGivenErrorInstance()
-    {
-        var operationResult = CreateEmptyStringResult();
-        var error = new ErrorResult("error", 1, "ex");
-        var returned = operationResult.AddError(error);
-
-        Assert.Same(operationResult, returned);
-        Assert.Single(operationResult.Errors);
-        Assert.Same(error, operationResult.Errors.First());
-    }
-
-    [Fact]
-    public void AddError_ErrorResult_AllowsNullErrorToBeAdded()
-    {
-        var operationResult = CreateEmptyStringResult();
+        var op = new OperationResult<object>();
         ErrorResult? error = null;
-
-        operationResult.AddError(error!);
-
-        Assert.Single(operationResult.Errors);
-        Assert.Null(operationResult.Errors.First());
+        var ex = Assert.Throws<ArgumentNullException>(() => OperationResultExtensions.AddError(op, error!));
+        Assert.Equal("error", ex.ParamName);
     }
-    #endregion
 
-    #region AddErrors
     [Fact]
-    public void AddErrors_NullOperationResult_ThrowsArgumentNullException()
+    public void AddErrors_ThrowsArgumentNullException_WhenOperationResultIsNull()
     {
-        OperationResult<string>? operationResult = null;
+        OperationResult<int>? op = null;
+        var ex = Assert.Throws<ArgumentNullException>(() => OperationResultExtensions.AddErrors(op!, []));
+        Assert.Equal("operationResult", ex.ParamName);
+        Assert.Contains("operationResult cannot be null", ex.Message);
+    }
+
+    [Fact]
+    public void AddErrors_ReturnsSameInstance_WhenValidationErrorsIsNull_AndDoesNotThrow()
+    {
+        var op = new OperationResult<int>();
+        IEnumerable<ErrorResult>? list = null;
+        var returned = OperationResultExtensions.AddErrors(op, list!);
+        Assert.Same(op, returned);
+        Assert.False(op.HasErrors);
+    }
+
+    [Fact]
+    public void AddErrors_AddsAllErrors_FromEnumerable()
+    {
+        var op = new OperationResult<int>();
         var errors = new List<ErrorResult>
-        {
-            new("e1", 1, "ex1")
-        };
-        var ex = Assert.Throws<ArgumentNullException>(() =>
-            OperationResultExtensions.AddErrors(operationResult!, errors));
-
-        Assert.Equal("operationResult", ex.ParamName);
-        Assert.Contains("operationResult cannot be null", ex.Message);
+            {
+                new("a", 1),
+                new("b", 2)
+            };
+        var returned = OperationResultExtensions.AddErrors(op, errors);
+        Assert.Same(op, returned);
+        Assert.Equal(2, op.Errors.Count);
+        Assert.Contains(op.Errors, e => e.Message == "a" && e.Code == 1);
+        Assert.Contains(op.Errors, e => e.Message == "b" && e.Code == 2);
     }
 
     [Fact]
-    public void AddErrors_NullValidationErrors_ReturnsSameInstanceWithoutChanges()
+    public void AddErrors_WithEnumerableContainingNull_BubblesArgumentNullException()
     {
-        var operationResult = CreateEmptyStringResult();
- 
-        operationResult.Errors.Add(new ErrorResult("existing", 1, "ex"));
-
-        IEnumerable<ErrorResult>? validationErrors = null;
-        var returned = operationResult.AddErrors(validationErrors!);
-
-        Assert.Same(operationResult, returned);
-        Assert.Single(operationResult.Errors);
+        var op = new OperationResult<int>();
+        var errors = new List<ErrorResult?> { new("a", 1), null };
+        // Cast to IEnumerable<ErrorResult> to match signature but keep a null inside
+        var cast = errors.Cast<ErrorResult>();
+        var ex = Assert.Throws<ArgumentNullException>(() => OperationResultExtensions.AddErrors(op, cast));
+        // The ArgumentNullException originates from OperationResult.AddError when it receives null
+        Assert.Equal("error", ex.ParamName);
     }
 
     [Fact]
-    public void AddErrors_EmptyValidationErrors_DoesNotChangeErrors()
+    public void Methods_AreChainable()
     {
-        var operationResult = CreateEmptyStringResult();
+        var op = new OperationResult<int>();
 
-        operationResult.Errors.Add(new ErrorResult("existing", 1, "ex"));
+        // Use extension methods explicitly to avoid ambiguity with instance methods that return void.
+        op = OperationResultExtensions.AddResult(op, 100);
+        op = OperationResultExtensions.AddError(op, "err", 5, null);
+        op = OperationResultExtensions.AddResultWithError(op, 200, new ErrorResult("e2", 6, null));
+        op = OperationResultExtensions.AddErrors(op, [new ErrorResult("e3", 7)]);
 
-        var validationErrors = new List<ErrorResult>();
-        var returned = operationResult.AddErrors(validationErrors);
-
-        Assert.Same(operationResult, returned);
-        Assert.Single(operationResult.Errors);
+        Assert.Equal(200, op.Result);
+        Assert.Equal(3, op.Errors.Count); // err(5), e2(6), e3(7)
+        Assert.Contains(op.Errors, e => e.Code == 5);
+        Assert.Contains(op.Errors, e => e.Code == 6);
+        Assert.Contains(op.Errors, e => e.Code == 7);
     }
-
-    [Fact]
-    public void AddErrors_AddsAllErrorsToOperationResult()
-    {
-        var operationResult = CreateEmptyStringResult();
-
-        var e1 = new ErrorResult("e1", 1, "ex1");
-        var e2 = new ErrorResult("e2", 2, "ex2");
-
-        var validationErrors = new List<ErrorResult> { e1, e2 };
-
-        var returned = operationResult.AddErrors(validationErrors);
-
-        Assert.Same(operationResult, returned);
-        Assert.Equal(2, operationResult.Errors.Count);
-        Assert.Same(e1, operationResult.Errors.First());
-        Assert.Same(e2, operationResult.Errors.Skip(1).First());
-    }
-
-    [Fact]
-    public void AddErrors_AppendsToExistingErrors()
-    {
-        var operationResult = CreateEmptyStringResult();
-        var existing = new ErrorResult("existing", 0, "ex0");
-
-        operationResult.Errors.Add(existing);
-
-        var e1 = new ErrorResult("e1", 1, "ex1");
-        var e2 = new ErrorResult("e2", 2, "ex2");
-        var validationErrors = new List<ErrorResult> { e1, e2 };
-
-        operationResult.AddErrors(validationErrors);
-
-        Assert.Equal(3, operationResult.Errors.Count);
-        Assert.Same(existing, operationResult.Errors.First());
-        Assert.Same(e1, operationResult.Errors.Skip(1).First());
-        Assert.Same(e2, operationResult.Errors.Skip(2).First());
-    }
-
-    [Fact]
-    public void AddErrors_AllowsNullEntriesInValidationErrors()
-    {
-        var operationResult = CreateEmptyStringResult();
-        var e1 = new ErrorResult("e1", 1, "ex1");
-        ErrorResult? eNull = null;
-        var validationErrors = new List<ErrorResult?> { e1, eNull };
-
-        // cast explícito a IEnumerable<ErrorResult> para coincidir con la firma del método
-        operationResult.AddErrors(validationErrors!);
-
-        Assert.Equal(2, operationResult.Errors.Count);
-        Assert.Same(e1, operationResult.Errors.First());
-        Assert.Null(operationResult.Errors.Skip(1).First());
-    }
-    #endregion
 }

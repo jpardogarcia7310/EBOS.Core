@@ -1,5 +1,8 @@
 ﻿namespace EBOS.Core.Primitives.Interfaces;
 
+/// <summary>
+/// Información básica del usuario en el contexto actual.
+/// </summary>
 public interface IUserInfo
 {
     int Id { get; set; }

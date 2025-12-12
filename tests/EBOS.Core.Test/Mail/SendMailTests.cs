@@ -372,33 +372,54 @@ public class SendMailTests
     {
         var messageDto = CreateBaseMessage();
         messageDto.BodyType = "plain";
-        // método privado estático, usamos reflexión
+
         var method = typeof(SendMail).GetMethod(
             "CreateMessage",
             BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.NotNull(method);
 
-        using var mimeMessage = (MimeMessage)method!.Invoke(null, [messageDto])!;
+        // Invoke devuelve (MimeMessage, List<IDisposable>)
+        var result = ((MimeMessage, List<IDisposable>))method!.Invoke(null, new object[] { messageDto })!;
 
-        // From
-        Assert.Single(mimeMessage.From);
-        var from = (MailboxAddress)mimeMessage.From[0];
-        Assert.Equal("Remitente", from.Name);
-        Assert.Equal("remitente@dominio.com", from.Address);
+        var mimeMessage = result.Item1;
+        var disposables = result.Item2;
 
-        // To
-        Assert.Single(mimeMessage.To);
-        var to = (MailboxAddress)mimeMessage.To[0];
-        Assert.Equal("Destinatario", to.Name);
-        Assert.Equal("destinatario@dominio.com", to.Address);
+        try
+        {
+            // From
+            Assert.Single(mimeMessage.From);
+            var from = (MailboxAddress)mimeMessage.From[0];
+            Assert.Equal("Remitente", from.Name);
+            Assert.Equal("remitente@dominio.com", from.Address);
 
-        // Subject
-        Assert.Equal("Asunto", mimeMessage.Subject);
+            // To
+            Assert.Single(mimeMessage.To);
+            var to = (MailboxAddress)mimeMessage.To[0];
+            Assert.Equal("Destinatario", to.Name);
+            Assert.Equal("destinatario@dominio.com", to.Address);
 
-        // Body
-        var body = Assert.IsType<TextPart>(mimeMessage.Body);
-        Assert.Equal("Cuerpo", body.Text);
+            // Subject
+            Assert.Equal("Asunto", mimeMessage.Subject);
+
+            // Body
+            var body = Assert.IsType<TextPart>(mimeMessage.Body);
+            Assert.Equal("Cuerpo", body.Text);
+        }
+        finally
+        {
+            // Liberar recursos auxiliares devueltos por CreateMessage
+            if (disposables != null)
+            {
+                foreach (var d in disposables)
+                {
+                    try { d?.Dispose(); } catch { /* ignore disposal errors in tests */ }
+                }
+            }
+
+            // Dispose del MimeMessage si implementa IDisposable (MimeMessage no implementa IDisposable,
+            // pero si tu CreateMessage devuelve objetos que requieren dispose, ya los hemos liberado).
+        }
     }
 
     [Fact]
@@ -413,29 +434,45 @@ public class SendMailTests
         {
             MediaType = "application/pdf",
             FileName = "test.pdf",
-            Content = [1, 2, 3]
+            Content = new byte[] { 1, 2, 3 }
         };
+
         var method = typeof(SendMail).GetMethod(
             "CreateMessage",
             BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.NotNull(method);
 
-        using var mimeMessage = (MimeMessage)method!.Invoke(null, [messageDto])!;
+        var result = ((MimeMessage, List<IDisposable>))method!.Invoke(null, new object[] { messageDto })!;
 
-        Assert.Equal("Asunto con adjunto", mimeMessage.Subject);
+        var mimeMessage = result.Item1;
+        var disposables = result.Item2;
 
-        var multipart = Assert.IsType<Multipart>(mimeMessage.Body);
-        Assert.Equal("mixed", multipart.ContentType.MediaSubtype);
-        Assert.Equal(2, multipart.Count);
+        try
+        {
+            Assert.Equal("Asunto con adjunto", mimeMessage.Subject);
 
-        var bodyPart = Assert.IsType<TextPart>(multipart[0]);
-        Assert.Equal("Mensaje con adjunto", bodyPart.Text);
+            var multipart = Assert.IsType<Multipart>(mimeMessage.Body);
+            Assert.Equal("mixed", multipart.ContentType.MediaSubtype);
+            Assert.Equal(2, multipart.Count);
 
-        var attachmentPart = Assert.IsType<MimePart>(multipart[1]);
-        Assert.Equal("test.pdf", attachmentPart.FileName);
+            var bodyPart = Assert.IsType<TextPart>(multipart[0]);
+            Assert.Equal("Mensaje con adjunto", bodyPart.Text);
+
+            var attachmentPart = Assert.IsType<MimePart>(multipart[1]);
+            Assert.Equal("test.pdf", attachmentPart.FileName);
+        }
+        finally
+        {
+            if (disposables != null)
+            {
+                foreach (var d in disposables)
+                {
+                    try { d?.Dispose(); } catch { /* ignore disposal errors in tests */ }
+                }
+            }
+        }
     }
-
     // -------------------------- Wiring del constructor por defecto --------------------------
 
     [Fact]

@@ -4,103 +4,128 @@ using System.Text.RegularExpressions;
 
 namespace EBOS.Core.Validators;
 
-public static class BankAccountValidator
+public static partial class BankAccountValidator
 {
-    private static readonly Regex IbanRegex =
-        new("^[A-Z]{2}[A-Z0-9]{18,30}$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex IbanRegex = RegExIban();
 
+    /// <summary>
+    /// Valida una cuenta bancaria española construyendo el IBAN a partir del código de país (ibanCode)
+    /// y las partes nacionales. Devuelve true si el IBAN calculado es válido y los dígitos de control nacionales coinciden.
+    /// </summary>
     public static bool IsValidBankAccount(string ibanCode, string bankCode, string branchCode,
         string accountControl, string accountMiddle, string accountEnd)
     {
-        if (string.IsNullOrWhiteSpace(ibanCode) || string.IsNullOrWhiteSpace(bankCode) || string.IsNullOrWhiteSpace(branchCode) ||
-            string.IsNullOrWhiteSpace(accountControl) || string.IsNullOrWhiteSpace(accountMiddle) || string.IsNullOrWhiteSpace(accountEnd))
+        if (string.IsNullOrWhiteSpace(ibanCode))
             return false;
 
-        var fullAccount = (ibanCode + bankCode + branchCode + accountControl + accountMiddle + accountEnd)
-            .Replace(" ", string.Empty, StringComparison.Ordinal)   // CA1307 corregido
-            .ToUpperInvariant();
+        var country = ibanCode.Trim().ToUpperInvariant();
 
-        if (!ValidateIban(fullAccount))
+        // Actualmente soportamos solo España (ES). Si necesitas otros países, hay que añadir reglas BBAN por país.
+        if (country != "ES")
             return false;
 
-        return ValidateControlDigits(bankCode, branchCode, accountControl, accountMiddle, accountEnd);
-    }
+        // Normalizar y validar partes nacionales (quitar espacios y guiones)
+        bankCode = (bankCode ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
+        branchCode = (branchCode ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
+        accountControl = (accountControl ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
+        accountMiddle = (accountMiddle ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
+        accountEnd = (accountEnd ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
 
-    private static bool ValidateIban(string fullAccount)
-    {
-        if (!IsValidIbanFormat(fullAccount))
+        // Longitudes esperadas para España
+        if (bankCode.Length != 4 || branchCode.Length != 4 || accountMiddle.Length != 4 || accountEnd.Length != 10)
             return false;
 
-        var rearranged = fullAccount[4..] + fullAccount[..4];
-        var ibanNumericString = ConvertToIbanNumericString(rearranged);
-
-        return VerifyIbanChecksum(ibanNumericString);
-    }
-
-    private static bool ValidateControlDigits(string bankCode, string branchCode, string accountControl, string accountMiddle, string accountEnd)
-    {
-        if (string.IsNullOrWhiteSpace(bankCode) || string.IsNullOrWhiteSpace(branchCode) || string.IsNullOrWhiteSpace(accountControl) ||
-            string.IsNullOrWhiteSpace(accountMiddle) || string.IsNullOrWhiteSpace(accountEnd))
+        if (accountControl.Length != 2 && accountControl.Length != 4)
             return false;
 
-        string controlDigits = accountControl.Length >= 2
-            ? accountControl.AsSpan(0, 2).ToString()
-            : "  ";
+        // Construir BBAN (para España: bank(4)+branch(4)+control(2)+accountMiddle(4)+accountEnd(10))
+        // Si accountControl tiene 4, sus últimos 2 dígitos forman parte del número de cuenta en el cálculo nacional.
+        string bban = string.Concat(bankCode, branchCode, accountControl.Length >= 4 ? accountControl.Substring(2, 2) : string.Empty, accountMiddle, accountEnd);
 
+        // Construir IBAN provisional con checksum "00"
+        var provisionalIban = country + "00" + bban;
+
+        // Calcular checksum IBAN
+        var numeric = ConvertToIbanNumericString(provisionalIban);
+        var checksum = CalculateIbanChecksum(numeric);
+        if (checksum is null)
+            return false;
+
+        var iban = country + checksum + bban;
+
+        // Validar formato IBAN y checksum
+        if (!IbanRegex.IsMatch(iban))
+            return false;
+
+        if (!ValidateIbanChecksum(iban))
+            return false;
+
+        // Validar dígitos de control nacionales (DC)
+        string controlDigits = accountControl.Length >= 2 ? accountControl[..2] : string.Empty;
         string accountNumber = accountControl.Length >= 4
-            ? string.Concat(accountControl.AsSpan(2, 2), accountMiddle, accountEnd)
-            : string.Concat("  ", accountMiddle, accountEnd);
+            ? string.Concat(accountControl.Substring(2, 2), accountMiddle, accountEnd)
+            : string.Concat(accountMiddle, accountEnd);
 
-        var expectedControlDigits = CalculateAccountControlDigits(bankCode, branchCode, accountNumber);
-        if (expectedControlDigits is null)
+        var expectedDc = CalculateAccountControlDigits(bankCode, branchCode, accountNumber);
+        if (expectedDc is null)
             return false;
 
-        return controlDigits == expectedControlDigits;
+        return controlDigits == expectedDc;
     }
 
-    private static bool VerifyIbanChecksum(string ibanNumericString)
+    private static string? CalculateIbanChecksum(string numericRepresentation)
     {
-        if (string.IsNullOrEmpty(ibanNumericString))
-            return false;
+        if (string.IsNullOrEmpty(numericRepresentation))
+            return null;
 
-        var checksum = 0;
-
-        foreach (var ch in ibanNumericString)
+        // Calcular resto módulo 97 de forma iterativa para evitar números grandes
+        var remainder = 0;
+        foreach (var ch in numericRepresentation)
         {
-            var digit = ch - '0';
-            if (digit < 0 || digit > 9)
-                return false;
-            checksum = (checksum * 10 + digit) % 97;
+            if (ch < '0' || ch > '9')
+                return null;
+            remainder = (remainder * 10 + (ch - '0')) % 97;
         }
 
-        return checksum == 1;
+        var checkValue = 98 - remainder;
+        return checkValue.ToString("D2", CultureInfo.InvariantCulture);
     }
 
-    private static string ConvertToIbanNumericString(string ibanPart)
+    private static bool ValidateIbanChecksum(string iban)
     {
-        const int asciiShift = 55; // 'A' = 65 -> 65 - 55 = 10
-        var builder = new StringBuilder(ibanPart.Length * 2);
+        if (string.IsNullOrWhiteSpace(iban) || iban.Length < 4)
+            return false;
 
-        foreach (var character in ibanPart)
+        var rearranged = iban[4..] + iban[..4];
+        var numeric = ConvertToIbanNumericString(rearranged);
+
+        var remainder = 0;
+        foreach (var ch in numeric)
         {
-            if (char.IsLetter(character))
+            if (ch < '0' || ch > '9')
+                return false;
+            remainder = (remainder * 10 + (ch - '0')) % 97;
+        }
+
+        return remainder == 1;
+    }
+
+    private static string ConvertToIbanNumericString(string input)
+    {
+        // A -> 10, B -> 11, ... Z -> 35
+        var sb = new StringBuilder(input.Length * 2);
+        foreach (var ch in input.ToUpperInvariant())
+        {
+            if (ch >= 'A' && ch <= 'Z')
             {
-                var value = character - asciiShift;
-                builder.Append(value.ToString(CultureInfo.InvariantCulture));
+                sb.Append((ch - 'A' + 10).ToString(CultureInfo.InvariantCulture));
             }
             else
-                builder.Append(character);
+            {
+                sb.Append(ch);
+            }
         }
-
-        return builder.ToString();
-    }
-
-    private static bool IsValidIbanFormat(string bankAccount)
-    {
-        if (string.IsNullOrWhiteSpace(bankAccount))
-            return false;
-
-        return IbanRegex.IsMatch(bankAccount);
+        return sb.ToString();
     }
 
     private static string? CalculateAccountControlDigits(string bankCode, string branchCode, string accountNumber)
@@ -110,41 +135,40 @@ public static class BankAccountValidator
         if (fullNumber.Length != 18)
             return null;
 
-        // Simplifica el bucle usando LINQ (Any)
-        if (fullNumber.Any(ch => !char.IsDigit(ch)))
+        if (fullNumber.Any(ch => ch < '0' || ch > '9'))
             return null;
 
-        var weights = new[] { 6, 3, 7, 9, 10, 5, 8, 4, 2, 1 };
+        // Pesos estándar para España:
+        var weightsOffice = new[] { 4, 8, 5, 10, 9, 7, 3, 6 };       // 8 dígitos (entidad+oficina)
+        var weightsAccount = new[] { 1, 2, 4, 8, 5, 10, 9, 7, 3, 6 }; // 10 dígitos (número de cuenta)
+
         var officePart = fullNumber.AsSpan(0, 8);
         var accountPart = fullNumber.AsSpan(8, 10);
-        var sum1 = 0;
 
-        for (var i = 0; i < officePart.Length; i++)
+        int sumOffice = 0;
+        for (int i = 0; i < officePart.Length; i++)
         {
-            var digit = officePart[i] - '0';
-
-            sum1 += digit * weights[i + 2]; // weights[2..9]
+            sumOffice += (officePart[i] - '0') * weightsOffice[i];
         }
 
-        var remainder1 = sum1 % 11;
-        var dc1Value = 11 - remainder1;
-        var dc1 = dc1Value switch
+        int remainderOffice = sumOffice % 11;
+        int dc1Value = 11 - remainderOffice;
+        string dc1 = dc1Value switch
         {
             11 => "0",
             10 => "1",
             _ => dc1Value.ToString(CultureInfo.InvariantCulture)
         };
-        var sum2 = 0;
 
-        for (var i = 0; i < accountPart.Length; i++)
+        int sumAccount = 0;
+        for (int i = 0; i < accountPart.Length; i++)
         {
-            var digit = accountPart[i] - '0';
-            sum2 += digit * weights[i];
+            sumAccount += (accountPart[i] - '0') * weightsAccount[i];
         }
 
-        var remainder2 = sum2 % 11;
-        var dc2Value = 11 - remainder2;
-        var dc2 = dc2Value switch
+        int remainderAccount = sumAccount % 11;
+        int dc2Value = 11 - remainderAccount;
+        string dc2 = dc2Value switch
         {
             11 => "0",
             10 => "1",
@@ -153,4 +177,8 @@ public static class BankAccountValidator
 
         return dc1 + dc2;
     }
+    // IBAN general: 2 letras (país) + 2 dígitos (checksum) + BBAN (hasta 30 caracteres)
+
+    [GeneratedRegex("^[A-Z]{2}\\d{2}[A-Z0-9]{11,30}$", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex RegExIban();
 }

@@ -7,7 +7,7 @@ namespace EBOS.Core.Primitives;
 /// Clase base práctica para las entidades.
 /// Las entidades del dominio deben heredar de esta clase.
 /// </summary>
-public abstract class BaseEntity 
+public abstract class BaseEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

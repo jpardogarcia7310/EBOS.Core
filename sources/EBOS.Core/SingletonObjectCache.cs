@@ -2,8 +2,7 @@
 
 namespace EBOS.Core;
 
-public class SingletonObjectCache
+public static class SingletonObjectCache
 {
-    protected SingletonObjectCache() { }
-    protected static readonly ObjectCache cache = MemoryCache.Default;
+    public static readonly ObjectCache Cache = MemoryCache.Default;
 }

@@ -26,7 +26,6 @@ public sealed class FakeSmtpClientAdapter : ISmtpClientAdapter
 
         return Task.CompletedTask;
     }
-
     public Task AuthenticateAsync(string userName, string password, CancellationToken cancellationToken = default)
     {
         AuthenticateCalled = true;
@@ -35,7 +34,6 @@ public sealed class FakeSmtpClientAdapter : ISmtpClientAdapter
 
         return Task.CompletedTask;
     }
-
     public Task SendAsync(MimeMessage message, CancellationToken cancellationToken = default)
     {
         SendCalled = true;
@@ -48,16 +46,21 @@ public sealed class FakeSmtpClientAdapter : ISmtpClientAdapter
 
         return Task.CompletedTask;
     }
-
     public Task DisconnectAsync(bool quit, CancellationToken cancellationToken = default)
     {
         DisconnectCalled = true;
 
         return Task.CompletedTask;
     }
-
     public void Dispose()
     {
         Disposed = true;
+    }
+    public ValueTask DisposeAsync()
+    {
+        // Implementación asíncrona compatible con IAsyncDisposable.
+        // Llamamos a Dispose() por seguridad y devolvemos CompletedTask.
+        Dispose();
+        return ValueTask.CompletedTask;
     }
 }
