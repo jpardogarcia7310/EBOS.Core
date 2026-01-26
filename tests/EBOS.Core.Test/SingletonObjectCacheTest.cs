@@ -8,7 +8,7 @@ public class SingletonObjectCacheTests
     private class TestSingletonObjectCache : SingletonObjectCache
     {
         // Exponemos el campo protegido estático para poder probarlo
-        public static ObjectCache Cache => cache;
+        public static ObjectCache Cache => SingletonObjectCache.Cache;
     }
     #endregion
 

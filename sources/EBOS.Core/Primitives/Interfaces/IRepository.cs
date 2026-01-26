@@ -10,6 +10,6 @@ public interface IRepository<TEntity> where TEntity : class
 
     #region Queries
     Task<ICollection<TEntity>> GetAllAsync(CancellationToken cancellationToken);
-    Task<TEntity?> GetByIdAsync(long id);
+    Task<TEntity?> GetByIdAsync(long id, CancellationToken cancellationToken);
     #endregion
 }

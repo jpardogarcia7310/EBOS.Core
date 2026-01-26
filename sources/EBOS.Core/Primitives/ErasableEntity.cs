@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace EBOS.Core.Primitives;
 
 /// <summary>
-/// Clase base práctica para las entidades que soportan borrado lógico.
+/// Practical base class for entities that support logical deletion.
 /// </summary>
 public abstract class ErasableEntity : BaseEntity, ISoftDeletable
 {

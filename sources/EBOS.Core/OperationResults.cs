@@ -4,14 +4,9 @@ namespace EBOS.Core;
 
 public class OperationResult<TResult>
 {
-    public OperationResult()
-    {
-        Errors = [];
-    }
-
     public TResult Result { get; set; } = default!;
 
-    public ICollection<ErrorResult> Errors { get; }
+    public ICollection<ErrorResult> Errors { get; } = [];
 
     public bool HasErrors => Errors.Any();
 }

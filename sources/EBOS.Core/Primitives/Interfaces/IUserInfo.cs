@@ -2,10 +2,10 @@
 
 public interface IUserInfo
 {
-    int Id { get; set; }
+    long Id { get; set; }
     string Username { get; set; }
     string Name { get; set; }
-    int LanguageId { get; set; }
+    long LanguageId { get; set; }
     string Email { get; set; }
-    int ConnectionId { get; set; }
+    long ConnectionId { get; set; }
 }

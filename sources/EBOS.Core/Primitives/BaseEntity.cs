@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EBOS.Core.Primitives;
 
 /// <summary>
-/// Clase base práctica para las entidades.
-/// Las entidades del dominio deben heredar de esta clase.
+/// Practical basic class for entities.
+/// The entities in the domain must inherit from this class.
 /// </summary>
 public abstract class BaseEntity 
 {
