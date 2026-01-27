@@ -16,9 +16,7 @@
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
 		<PackageTags>Core; Kernel; Primitives; Cryptography; BusinessErrors; Extensions</PackageTags>
-		<PackageReleaseNotes>The repository interface has been modified so that the asynchronous method GetByIdAsync accepts the CancellationToken as a parameter, thus allowing cancellation during operation.
-The data types of the Id, LanguageId, and ConnectionId properties in the user information interface (IUserIInfo) have also been changed from integers (int) to long integers (long).
-In the BaseEntity class, the class description has been standardized to English.</PackageReleaseNotes>
+		<PackageReleaseNotes>The EndTransaction method of the IUnitOfWork interface now includes the CancellationToken parameter.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
 		<FileVersion>$(VersionPrefix)</FileVersion>
@@ -34,6 +32,7 @@ In the BaseEntity class, the class description has been standardized to English.
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<Version>1.5.2</Version>
 	</PropertyGroup>
 
     <ItemGroup>
