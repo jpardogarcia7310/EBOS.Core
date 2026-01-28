@@ -8,7 +8,7 @@ public class BaseEntityTests
 {
     private class TestEntity : BaseEntity { }
 
-    // ----- INSTANCIACIÓN -----
+    // ----- INSTANTIATION -----
 
     [Fact]
     public void BaseEntity_ShouldBeInstantiableThroughChildClass()
@@ -66,7 +66,7 @@ public class BaseEntityTests
                        .FirstOrDefault();
 
         Assert.NotNull(attr);
-        Assert.Equal(DatabaseGeneratedOption.Identity, attr!.DatabaseGeneratedOption);
+        Assert.Equal(DatabaseGeneratedOption.Identity, attr.DatabaseGeneratedOption);
     }
 
     // ----- TYPE CHECKS -----

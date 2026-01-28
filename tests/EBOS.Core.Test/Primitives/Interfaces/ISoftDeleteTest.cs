@@ -9,7 +9,7 @@ public class ISoftDeletableTests
         public bool Erased { get; set; }
     }
 
-    // ----- INSTANCIACIÓN -----
+    // ----- INSTANTIATION -----
 
     [Fact]
     public void SoftDeletable_ShouldAllowInstantiationViaImplementer()
