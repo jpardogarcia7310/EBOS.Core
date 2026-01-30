@@ -5,9 +5,9 @@ public interface IRepository<TEntity> where TEntity : class
     #region Commands
     Task AddAsync(TEntity entity, CancellationToken cancellationToken);
     Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken);
-    void AttachAsync(TEntity entity, CancellationToken cancellationToken);
-    void UpdateAsync(TEntity entity, CancellationToken cancellationToken);
-    void DeleteAsync(TEntity entity, CancellationToken cancellationToken);
+    Task AttachAsync(TEntity entity, CancellationToken cancellationToken);
+    Task UpdateAsync(TEntity entity, CancellationToken cancellationToken);
+    Task DeleteAsync(TEntity entity, CancellationToken cancellationToken);
     #endregion
 
     #region Queries

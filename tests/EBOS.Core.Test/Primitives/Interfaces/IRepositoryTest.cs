@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using EBOS.Core.Primitives.Interfaces;
 
 namespace EBOS.Core.Test.Primitives.Interfaces;
@@ -16,20 +13,14 @@ public class IRepositoryTests
         public Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
             => Task.CompletedTask;
 
-        public void AttachAsync(TEntity entity, CancellationToken cancellationToken)
-        {
-            // No-op for testing contract
-        }
+        public Task AttachAsync(TEntity entity, CancellationToken cancellationToken)
+            => Task.CompletedTask;
 
-        public void UpdateAsync(TEntity entity, CancellationToken cancellationToken)
-        {
-            // No-op for testing contract
-        }
+        public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
+            => Task.CompletedTask;
 
-        public void DeleteAsync(TEntity entity, CancellationToken cancellationToken)
-        {
-            // No-op for testing contract
-        }
+        public Task DeleteAsync(TEntity entity, CancellationToken cancellationToken)
+            => Task.CompletedTask;
 
         public Task<ICollection<TEntity>> GetAllAsync(CancellationToken cancellationToken)
             => Task.FromResult<ICollection<TEntity>>(new List<TEntity>());
@@ -47,7 +38,7 @@ public class IRepositoryTests
         var method = type.GetMethod(nameof(IRepository<object>.AddAsync));
 
         Assert.NotNull(method);
-        Assert.Equal(typeof(Task), method!.ReturnType);
+        Assert.Equal(typeof(Task), method.ReturnType);
 
         var parameters = method.GetParameters();
         Assert.Equal(2, parameters.Length);
@@ -65,7 +56,7 @@ public class IRepositoryTests
         var method = type.GetMethod(nameof(IRepository<object>.AddRangeAsync));
 
         Assert.NotNull(method);
-        Assert.Equal(typeof(Task), method!.ReturnType);
+        Assert.Equal(typeof(Task), method.ReturnType);
 
         var parameters = method.GetParameters();
         Assert.Equal(2, parameters.Length);
@@ -84,7 +75,7 @@ public class IRepositoryTests
         var method = type.GetMethod(nameof(IRepository<object>.AttachAsync));
 
         Assert.NotNull(method);
-        Assert.Equal(typeof(void), method!.ReturnType);
+        Assert.Equal(typeof(Task), method.ReturnType);
 
         var parameters = method.GetParameters();
         Assert.Equal(2, parameters.Length);
@@ -102,7 +93,7 @@ public class IRepositoryTests
         var method = type.GetMethod(nameof(IRepository<object>.UpdateAsync));
 
         Assert.NotNull(method);
-        Assert.Equal(typeof(void), method!.ReturnType);
+        Assert.Equal(typeof(Task), method.ReturnType);
 
         var parameters = method.GetParameters();
         Assert.Equal(2, parameters.Length);
@@ -120,7 +111,7 @@ public class IRepositoryTests
         var method = type.GetMethod(nameof(IRepository<object>.DeleteAsync));
 
         Assert.NotNull(method);
-        Assert.Equal(typeof(void), method!.ReturnType);
+        Assert.Equal(typeof(Task), method.ReturnType);
 
         var parameters = method.GetParameters();
         Assert.Equal(2, parameters.Length);
@@ -139,7 +130,7 @@ public class IRepositoryTests
 
         Assert.NotNull(method);
 
-        Assert.True(method!.ReturnType.IsGenericType);
+        Assert.True(method.ReturnType.IsGenericType);
         Assert.Equal(typeof(Task<>), method.ReturnType.GetGenericTypeDefinition());
 
         var inner = method.ReturnType.GenericTypeArguments[0];
@@ -159,7 +150,7 @@ public class IRepositoryTests
 
         Assert.NotNull(method);
 
-        Assert.True(method!.ReturnType.IsGenericType);
+        Assert.True(method.ReturnType.IsGenericType);
         Assert.Equal(typeof(Task<>), method.ReturnType.GetGenericTypeDefinition());
 
         var inner = method.ReturnType.GenericTypeArguments[0];
@@ -187,7 +178,7 @@ public class IRepositoryTests
     public async Task Implementation_AllowsCallingAddRangeAsync()
     {
         IRepository<DummyEntity> repo = new TestRepository<DummyEntity>();
-        await repo.AddRangeAsync(new[] { new DummyEntity() }, CancellationToken.None);
+        await repo.AddRangeAsync([new DummyEntity()], CancellationToken.None);
     }
 
     [Fact]
