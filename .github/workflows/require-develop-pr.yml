@@ -1,0 +1,19 @@
+name: Require develop PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  require-develop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR source branch
+        run: |
+          echo "Base: ${{ github.base_ref }}"
+          echo "Head: ${{ github.head_ref }}"
+          if [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "PR must come from develop branch."
+            exit 1
+          fi
