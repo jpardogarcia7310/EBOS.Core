@@ -13,9 +13,7 @@
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
 		<PackageTags>Core; Kernel; Primitives; Cryptography; BusinessErrors; Extensions</PackageTags>
-		<PackageReleaseNotes>A documentation error report was created.
-New tests were generated to address the missing use cases.
-The version number was changed.</PackageReleaseNotes>
+		<PackageReleaseNotes>I've corrected the generic repository interface IRepository so that the GetAll methods of all repositories return a read-only collection of the entity in question.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		
 		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
