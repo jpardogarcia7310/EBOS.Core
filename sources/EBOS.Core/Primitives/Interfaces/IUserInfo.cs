@@ -1,7 +1,7 @@
 ﻿namespace EBOS.Core.Primitives.Interfaces;
 
 /// <summary>
-/// Información básica del usuario en el contexto actual.
+/// Basic user information in the current context.
 /// </summary>
 public interface IUserInfo
 {

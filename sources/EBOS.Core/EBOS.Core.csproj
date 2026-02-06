@@ -39,6 +39,10 @@ And the Errorresult primitive has been corrected so that the exceptionMsg parame
 	</PropertyGroup>
 
     <ItemGroup>
+      <None Remove=".gitignore" />
+    </ItemGroup>
+
+    <ItemGroup>
       <None Include="..\..\documentacion\Images\Logo_EBOS_128.png">
         <Pack>True</Pack>
         <PackagePath>\</PackagePath>

@@ -15,7 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBOS.Core.Test", "tests\EBO
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementos de la solución", "Elementos de la solución", "{77E9C33F-F901-4913-97CB-0230A3C7D781}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{CFC3D6EA-3CE0-400A-896C-E265E5FF1367}"
