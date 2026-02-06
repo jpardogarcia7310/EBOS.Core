@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/Documentation/">
+    <File Path="documentation/Bugs.md" />
+    <File Path="documentation/Bugs_Es.md" />
+  </Folder>
+  <Folder Name="/Documentation/Images/">
+    <File Path="documentacion/Images/Logo_EBOS_128.png" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="README_ES.md" />
+  </Folder>
+  <Folder Name="/Source/">
+    <Project Path="sources/EBOS.Core/EBOS.Core.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/EBOS.Core.Test/EBOS.Core.Test.csproj" />
+  </Folder>
+</Solution>

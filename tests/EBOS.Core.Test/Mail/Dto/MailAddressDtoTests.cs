@@ -23,15 +23,15 @@ public class MailAddressDtoTests
     public void Properties_AreMutable()
     {
         // Arrange
-        var dto = new MailAddressDto("OldName", "old@ejemplo.com")
+        var dto = new MailAddressDto("OldName", "old@example.com")
         {
             // Act
             Name = "NewName",
-            Address = "new@ejemplo.com"
+            Address = "new@example.com"
         };
 
         // Assert
         Assert.Equal("NewName", dto.Name);
-        Assert.Equal("new@ejemplo.com", dto.Address);
+        Assert.Equal("new@example.com", dto.Address);
     }
 }

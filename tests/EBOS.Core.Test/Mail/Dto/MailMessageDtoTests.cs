@@ -29,8 +29,8 @@ public class MailMessageDtoTests
     {
         // Arrange
         var dto = new MailMessageDto();
-        var from = new MailAddressDto("Desde", "desde@ejemplo.com");
-        var to = new MailAddressDto("Hasta", "hasta@ejemplo.com");
+        var from = new MailAddressDto("From", "from@example.com");
+        var to = new MailAddressDto("To", "to@example.com");
 
         // Act
         dto.FromAddress.Add(from);
