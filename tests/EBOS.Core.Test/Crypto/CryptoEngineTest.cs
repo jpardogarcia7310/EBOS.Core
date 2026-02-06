@@ -108,7 +108,7 @@ public class CryptoEngineTests
     public void EncryptToAES_And_DecryptFromAES_Roundtrip()
     {
         const string key = "1234567890ABCDEF"; // 16 bytes
-        const string plainText = "Texto secreto de prueba";
+        const string plainText = "Test secret text";
         byte[] iv = new byte[16]; // buffer filled inside EncryptToAES
         byte[] cipher = _crypto.EncryptToAES(plainText, key, iv);
         string result = _crypto.DecryptFromAES(cipher, key, iv);
