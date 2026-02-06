@@ -1,7 +1,7 @@
 namespace EBOS.Core.Primitives.Interfaces;
 
-public interface IReadOnlyRepository<T> where T : class
+public interface IReadOnlyRepository<TEntity> where TEntity : class
 {
-    Task<T?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
-    Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<TEntity?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
 }

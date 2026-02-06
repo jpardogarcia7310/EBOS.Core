@@ -1,7 +1,8 @@
 namespace EBOS.Core.Primitives.Interfaces;
 
-public interface IPagedRepository<T> : IRepository<T> where T : class
+public interface IPagedRepository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    Task<IReadOnlyCollection<T>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<TEntity>> GetAllPagedAsync(int pageNumber, int pageSize, 
+        CancellationToken cancellationToken = default);
     Task<int> CountAsync(CancellationToken cancellationToken = default);
 }
