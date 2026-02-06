@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Mail;
+using EBOS.Core.Mail;
 using MimeKit;
 
 namespace EBOS.Core.Test.Mail;
@@ -38,7 +38,7 @@ public sealed class FakeSmtpClientAdapter : ISmtpClientAdapter
     {
         SendCalled = true;
 
-        // Guardamos una copia independiente del mensaje para inspeccionarla en los tests
+        // Store an independent copy of the message for test inspection.
         using var ms = new MemoryStream();
         message.WriteTo(ms, cancellationToken);
         ms.Position = 0;
@@ -58,8 +58,8 @@ public sealed class FakeSmtpClientAdapter : ISmtpClientAdapter
     }
     public ValueTask DisposeAsync()
     {
-        // Implementación asíncrona compatible con IAsyncDisposable.
-        // Llamamos a Dispose() por seguridad y devolvemos CompletedTask.
+        // Async implementation compatible with IAsyncDisposable.
+        // Call Dispose() for safety and return CompletedTask.
         Dispose();
         return ValueTask.CompletedTask;
     }

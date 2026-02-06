@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Extensions;
+using EBOS.Core.Extensions;
 
 namespace EBOS.Core.Test.Extensions;
 
@@ -57,7 +57,7 @@ public class StringExtensionsTests
     [Fact]
     public void ToDateFromStringIso8601Format_InvalidDate_ReturnsNull()
     {
-        var input = "20251340"; // mes y día inválidos
+        var input = "20251340"; // invalid month and day
         var result = input.ToDateFromStringIso8601Format();
 
         Assert.Null(result);
@@ -66,7 +66,7 @@ public class StringExtensionsTests
     [Fact]
     public void ToDateFromStringIso8601Format_WrongLength_ReturnsNull()
     {
-        var input = "202511"; // demasiado corto
+        var input = "202511"; // too short
         var result = input.ToDateFromStringIso8601Format();
 
         Assert.Null(result);
@@ -126,7 +126,7 @@ public class StringExtensionsTests
     [Fact]
     public void ToDateFromStringWithHHMM_InvalidTime_ReturnsNull()
     {
-        var input = "202511192565"; // 25h 65m inválido
+        var input = "202511192565"; // invalid 25h 65m
         var result = input.ToDateFromStringWithHHMM();
 
         Assert.Null(result);
@@ -135,7 +135,7 @@ public class StringExtensionsTests
     [Fact]
     public void ToDateFromStringWithHHMM_WrongLength_ReturnsNull()
     {
-        var input = "20251119"; // sin HHmm
+        var input = "20251119"; // missing HHmm
         var result = input.ToDateFromStringWithHHMM();
 
         Assert.Null(result);
@@ -185,8 +185,8 @@ public class StringExtensionsTests
         var input = "Hola,\n\"mundo\"\r\n\t& 'texto', fin" + Environment.NewLine;
         var result = input.RemoveSpecialCharacters();
 
-        // Tras eliminar saltos de línea, tabulaciones, comillas, comas, apóstrofes y &
-        // queda: "Holamundo texto fin"
+        // After removing newlines, tabs, quotes, commas, apostrophes, and &
+        // the result is: "Holamundo texto fin"
         Assert.Equal("Holamundo texto fin", result);
     }
 
@@ -205,7 +205,7 @@ public class StringExtensionsTests
         var input = "Hola \n mundo \t bonito & feliz";
         var result = input.RemoveSpecialCharacters();
 
-        // Se eliminan los especiales, pero se conservan los espacios normales
+        // Special chars are removed, but normal spaces are preserved
         Assert.Equal("Hola  mundo  bonito  feliz", result);
     }
     #endregion

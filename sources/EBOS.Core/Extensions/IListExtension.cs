@@ -1,4 +1,4 @@
-﻿namespace EBOS.Core.Extensions;
+namespace EBOS.Core.Extensions;
 
 public static class IListExtension
 {

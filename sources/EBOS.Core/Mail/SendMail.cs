@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Mail.Dto;
+using EBOS.Core.Mail.Dto;
 using MailKit;
 using MimeKit;
 using System.Diagnostics.CodeAnalysis;
@@ -13,6 +13,10 @@ public class SendMail(ISmtpClientFactory smtpClientFactory, ILogger<SendMail>? l
     public SendMail() : this(new MailKitSmtpClientFactory(), logger: null)
     { }
 
+    [SuppressMessage(
+        "Design",
+        "CA1031:Do not catch general exception types",
+        Justification = "Dispose failures are non-fatal and are logged for diagnostics.")]
     public async Task SendAsync(MailMessageDto mailMessageDto, MailSettingsDto mailSettings)
     {
         if (mailMessageDto is null)
@@ -29,8 +33,8 @@ public class SendMail(ISmtpClientFactory smtpClientFactory, ILogger<SendMail>? l
 
         var (message, disposables) = CreateMessage(mailMessageDto);
 
-        // Crear el cliente y asegurarnos de que se DisposeAsync al salir
-        await using var client = _smtpClientFactory.Create();
+        // Create the client and ensure DisposeAsync runs on exit.
+        var client = _smtpClientFactory.Create();
 
         try
         {
@@ -52,6 +56,8 @@ public class SendMail(ISmtpClientFactory smtpClientFactory, ILogger<SendMail>? l
                     }
                 }
             }
+
+            await client.DisposeAsync().ConfigureAwait(false);
         }
     }
 
@@ -90,7 +96,7 @@ public class SendMail(ISmtpClientFactory smtpClientFactory, ILogger<SendMail>? l
     [SuppressMessage(
         "Reliability",
         "CA2000:Dispose objects before losing scope",
-        Justification = "Los disposables creados se devuelven al llamador para su liberación controlada.")]
+        Justification = "Created disposables are returned to the caller for controlled cleanup.")]
     private static (MimeMessage Message, List<IDisposable> Disposables) CreateMessage(MailMessageDto mailMessageDto)
     {
         var disposables = new List<IDisposable>();
@@ -116,7 +122,7 @@ public class SendMail(ISmtpClientFactory smtpClientFactory, ILogger<SendMail>? l
 
         var attachmentDto = mailMessageDto.MailAttachment;
 
-        // Crear MemoryStream de solo lectura y añadirlo a disposables para su liberación posterior
+        // Create a read-only MemoryStream and track it for disposal later.
         var ms = new MemoryStream(attachmentDto.Content, writable: false);
         disposables.Add(ms);
 
@@ -139,8 +145,8 @@ public class SendMail(ISmtpClientFactory smtpClientFactory, ILogger<SendMail>? l
     }
 
     /// <summary>
-    /// Método de instancia que realiza la conexión, autenticación, envío y desconexión.
-    /// Registra IOException antes de relanzarla para diagnóstico.
+    /// Instance method that connects, authenticates, sends, and disconnects.
+    /// Logs IOException before rethrowing for diagnostics.
     /// </summary>
     private async Task SendMessageAsync(MailSettingsDto mailSettings,
         ISmtpClientAdapter client, MimeMessage message)
@@ -181,7 +187,7 @@ public class SendMail(ISmtpClientFactory smtpClientFactory, ILogger<SendMail>? l
     }
 
     /// <summary>
-    /// Clase interna con delegados LoggerMessage para evitar formateo innecesario.
+    /// Internal class with LoggerMessage delegates to avoid unnecessary formatting.
     /// </summary>
     private static class Log
     {

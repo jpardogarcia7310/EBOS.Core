@@ -1,14 +1,14 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
 namespace EBOS.Core.Mail.Dto;
 
 /// <summary>
-/// DTO mínimo para representar un mensaje de correo.
-/// Ajusta o amplía según tus necesidades reales.
+/// Minimal DTO to represent an email message.
+/// Adjust or extend based on your actual needs.
 /// </summary>
 public class MailMessageDto
 {
-    // Colecciones solo lectura (la referencia), pero mutables por dentro.
+    // Read-only collections (by reference), but mutable internally.
     public Collection<MailAddressDto> FromAddress { get; } = [];
     public Collection<MailAddressDto> ToAddress { get; } = [];
 

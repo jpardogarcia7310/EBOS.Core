@@ -1,4 +1,4 @@
-﻿namespace EBOS.Core.BusinessErrors;
+namespace EBOS.Core.BusinessErrors;
 
 public class BusinessErrorObject
 {

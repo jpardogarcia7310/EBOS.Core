@@ -1,17 +1,9 @@
-﻿using System.Runtime.Caching;
+using System.Runtime.Caching;
 
 namespace EBOS.Core.Test;
 
 public class SingletonObjectCacheTests
 {
-    #region Helper derived class to access protected members
-    private class TestSingletonObjectCache : SingletonObjectCache
-    {
-        // Exponemos el campo protegido estático para poder probarlo
-        public static ObjectCache Cache => SingletonObjectCache.Cache;
-    }
-    #endregion
-
     #region Constructor behavior
     [Fact]
     public void Cache_IsAccessibleAndSameInstance()
@@ -31,4 +23,5 @@ public class SingletonObjectCacheTests
         Assert.Equal("value", value);
         cache.Remove(key);
     }
+    #endregion
 }

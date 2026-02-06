@@ -1,4 +1,4 @@
-﻿namespace EBOS.Core.Enums;
+namespace EBOS.Core.Enums;
 
 public enum AuditDescriptionOptions
 {

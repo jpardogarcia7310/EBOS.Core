@@ -1,4 +1,4 @@
-﻿using MailKit.Net.Smtp;
+using MailKit.Net.Smtp;
 using MimeKit;
 
 namespace EBOS.Core.Mail;
@@ -22,9 +22,9 @@ public sealed class MailKitSmtpClientAdapter(SmtpClient inner) : ISmtpClientAdap
     public void Dispose() => _inner.Dispose();
 
     /// <summary>
-    /// Dispose asíncrono del adaptador.
-    /// Intenta desconectar de forma asíncrona y luego libera el cliente de forma síncrona.
-    /// Captura excepciones específicas esperables durante el cierre y relanza cualquier otra excepción.
+    /// Asynchronous dispose for the adapter.
+    /// Tries to disconnect asynchronously and then releases the client synchronously.
+    /// Catches expected exceptions during shutdown and rethrows any other exception.
     /// </summary>
     public async ValueTask DisposeAsync()
     {
@@ -34,30 +34,30 @@ public sealed class MailKitSmtpClientAdapter(SmtpClient inner) : ISmtpClientAdap
         }
         catch (OperationCanceledException)
         {
-            // Si la operación fue cancelada, propagar la cancelación para que el llamador lo sepa.
+            // If the operation was canceled, propagate the cancellation so the caller knows.
             throw;
         }
         catch (IOException)
         {
-            // Errores de E/S durante el Disconnect son relativamente comunes en redes inestables;
-            // los ignoramos aquí para no ocultar la excepción original del flujo de trabajo,
-            // pero no re-lanzamos para permitir la liberación de recursos.
+            // I/O errors during Disconnect are relatively common on unstable networks;
+            // ignore them here to avoid masking the original flow exception,
+            // but do not rethrow to allow resource cleanup.
         }
         catch (MailKit.Net.Smtp.SmtpCommandException)
         {
-            // Excepciones de comando SMTP durante el cierre pueden ocurrir; no las propagamos.
+            // SMTP command exceptions during shutdown may occur; we do not propagate them.
         }
         catch (MailKit.ProtocolException)
         {
-            // Errores de protocolo de MailKit durante el Disconnect; no los propagamos.
+            // MailKit protocol errors during Disconnect; we do not propagate them.
         }
         catch (Exception)
         {
-            // Para cualquier otra excepción inesperada, re-lanzamos para no ocultar fallos graves.
+            // For any other unexpected exception, rethrow to avoid hiding serious failures.
             throw;
         }
 
-        // Liberación final sincrónica (compatible con todas las versiones de MailKit)
+        // Final synchronous release (compatible with all MailKit versions).
         _inner.Dispose();
     }
 }

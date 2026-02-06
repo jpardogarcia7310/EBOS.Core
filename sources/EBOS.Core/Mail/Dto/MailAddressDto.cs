@@ -1,4 +1,4 @@
-﻿namespace EBOS.Core.Mail.Dto;
+namespace EBOS.Core.Mail.Dto;
 
 public class MailAddressDto(string name, string address)
 {

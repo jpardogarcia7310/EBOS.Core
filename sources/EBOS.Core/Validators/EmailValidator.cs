@@ -1,4 +1,4 @@
-﻿using System.Net.Mail;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace EBOS.Core.Validators;

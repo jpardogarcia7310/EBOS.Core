@@ -1,4 +1,4 @@
-﻿namespace EBOS.Core.Test.Primitives.Interfaces;
+namespace EBOS.Core.Test.Primitives.Interfaces;
 
 public interface IUnitOfWork
 {

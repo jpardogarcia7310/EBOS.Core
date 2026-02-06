@@ -1,4 +1,4 @@
-﻿namespace EBOS.Core.Mail;
+namespace EBOS.Core.Mail;
 
 public interface ISmtpClientFactory
 {

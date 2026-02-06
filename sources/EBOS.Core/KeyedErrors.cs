@@ -1,10 +1,10 @@
-﻿using EBOS.Core.Primitives.Interfaces;
+using EBOS.Core.Primitives.Interfaces;
 using System.Collections.ObjectModel;
 
 namespace EBOS.Core;
 
 /// <summary>
-/// KeyedCollection auxiliar que usa el Code como clave.
+/// Helper KeyedCollection that uses Code as the key.
 /// </summary>
 public sealed class KeyedErrors : KeyedCollection<int, IErrorResult>
 {

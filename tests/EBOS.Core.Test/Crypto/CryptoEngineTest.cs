@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Crypto;
+using EBOS.Core.Crypto;
 
 namespace EBOS.Core.Test.Crypto;
 
@@ -10,7 +10,7 @@ public class CryptoEngineTests
     [Fact]
     public void EncryptToBase64_And_DecryptFromBase64_Roundtrip()
     {
-        const string original = "Texto de prueba con ñ y €";
+        const string original = "Test text with n and EUR";
         string base64 = _crypto.EncryptToBase64(original);
         string result = _crypto.DecryptFromBase64(base64);
 
@@ -76,7 +76,7 @@ public class CryptoEngineTests
 
     [Theory]
     [InlineData(-1)]
-    [InlineData(10)] // mayor que la longitud del buffer
+    [InlineData(10)] // greater than the buffer length
     public void GetSaltAndCiphertext_Throws_On_Invalid_Salt_Length(int saltLength)
     {
         byte[] cipher = [1, 2, 3, 4, 5];
@@ -109,7 +109,7 @@ public class CryptoEngineTests
     {
         const string key = "1234567890ABCDEF"; // 16 bytes
         const string plainText = "Texto secreto de prueba";
-        byte[] iv = new byte[16]; // buffer que será rellenado dentro de EncryptToAES
+        byte[] iv = new byte[16]; // buffer filled inside EncryptToAES
         byte[] cipher = _crypto.EncryptToAES(plainText, key, iv);
         string result = _crypto.DecryptFromAES(cipher, key, iv);
 
@@ -146,7 +146,7 @@ public class CryptoEngineTests
     {
         const string key = "1234567890ABCDEF";
         const string plainText = "Texto";
-        byte[] wrongIv = new byte[8]; // longitud incorrecta
+        byte[] wrongIv = new byte[8]; // invalid length
 
         Assert.Throws<ArgumentException>(() => _crypto.EncryptToAES(plainText, key, wrongIv));
     }
@@ -208,7 +208,7 @@ public class CryptoEngineTests
     [Theory]
     [InlineData("test")]
     [InlineData("")]
-    [InlineData("Texto con acentos áéíóú")]
+    [InlineData("Text with accents aeio u")]
     public void GenerateSHA256_Returns_NonEmpty_Hex(string input)
     {
         string hash = _crypto.GenerateSHA256(input);

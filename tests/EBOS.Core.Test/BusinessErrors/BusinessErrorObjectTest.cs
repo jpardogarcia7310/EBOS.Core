@@ -1,4 +1,4 @@
-﻿using EBOS.Core.BusinessErrors;
+using EBOS.Core.BusinessErrors;
 
 namespace EBOS.Core.Test.BusinessErrors;
 
@@ -10,7 +10,7 @@ public class BusinessErrorObjectTests
     {
         var error = new BusinessErrorObject();
 
-        // En tiempo de ejecución, al usar "= null!" el valor inicial es realmente null
+        // At runtime, using "= null!" still initializes the value as null.
         Assert.Null(error.Message);
         Assert.Equal(0, error.Code);
     }

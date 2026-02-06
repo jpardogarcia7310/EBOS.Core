@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Mail.Dto;
+using EBOS.Core.Mail.Dto;
 using System.Collections.ObjectModel;
 
 namespace EBOS.Core.Test.Mail.Dto;
@@ -56,14 +56,14 @@ public class MailMessageDtoTests
         };
 
         // Act
-        dto.Subject = "Asunto";
-        dto.Message = "Cuerpo del mensaje";
+        dto.Subject = "Subject";
+        dto.Message = "Message body";
         dto.BodyType = "text/plain";
         dto.MailAttachment = attachment;
 
         // Assert
-        Assert.Equal("Asunto", dto.Subject);
-        Assert.Equal("Cuerpo del mensaje", dto.Message);
+        Assert.Equal("Subject", dto.Subject);
+        Assert.Equal("Message body", dto.Message);
         Assert.Equal("text/plain", dto.BodyType);
         Assert.Same(attachment, dto.MailAttachment);
     }

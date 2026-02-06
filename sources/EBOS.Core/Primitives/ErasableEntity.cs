@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Primitives.Interfaces;
+using EBOS.Core.Primitives.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace EBOS.Core.Primitives;

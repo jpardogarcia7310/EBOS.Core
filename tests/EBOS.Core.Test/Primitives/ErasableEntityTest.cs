@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Primitives;
+using EBOS.Core.Primitives;
 using EBOS.Core.Primitives.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,7 +8,7 @@ public class ErasbleEntityTests
 {
     private class TestEntity : ErasableEntity { }
 
-    // ----- INSTANCIACIÓN -----
+    // ----- INSTANTIATION -----
 
     [Fact]
     public void ErasbleEntity_ShouldBeInstantiableThroughChild()
@@ -18,7 +18,7 @@ public class ErasbleEntityTests
         Assert.NotNull(entity);
     }
 
-    // ----- HERENCIA -----
+    // ----- INHERITANCE -----
 
     [Fact]
     public void ErasbleEntity_ShouldInheritFromBaseEntity()
@@ -32,7 +32,7 @@ public class ErasbleEntityTests
         Assert.True(typeof(ISoftDeletable).IsAssignableFrom(typeof(ErasableEntity)));
     }
 
-    // ----- PROPIEDAD ERASED -----
+    // ----- ERASED PROPERTY -----
 
     [Fact]
     public void Erased_DefaultValue_ShouldBeFalse()
@@ -52,7 +52,7 @@ public class ErasbleEntityTests
         Assert.Equal(value, entity.Erased);
     }
 
-    // ----- VALIDACIONES -----
+    // ----- VALIDATIONS -----
 
     [Fact]
     public void Erased_ShouldHaveRequiredAttribute()
@@ -63,21 +63,21 @@ public class ErasbleEntityTests
         Assert.NotNull(attr);
     }
 
-    // ----- VALIDATION NEGATIVE -----
+    // ----- NEGATIVE VALIDATION -----
 
     [Fact]
     public void Required_Erased_ShouldFailValidation_WhenNotProvided()
     {
-        var entity = new TestEntity(); // no seteamos nada
+        var entity = new TestEntity(); // leave defaults
         var ctx = new ValidationContext(entity);
         var results = new List<ValidationResult>();
         var valid = Validator.TryValidateObject(entity, ctx, results, validateAllProperties: true);
 
-        // Aunque false sea un valor booleano válido, Required en bool significa "debe incluirse"
-        Assert.True(valid, "El atributo Required en bool no causa error porque false sigue siendo un valor válido.");
+        // Even though false is a valid boolean value, Required on bool means "must be present".
+        Assert.True(valid, "The Required attribute on bool does not raise an error because false is still a valid value.");
     }
 
-    // ----- CONTRACT COMPLETO -----
+    // ----- FULL CONTRACT -----
 
     [Fact]
     public void ErasbleEntity_ShouldExposeIdAndErasedProperties()
@@ -89,7 +89,7 @@ public class ErasbleEntityTests
         Assert.Contains("Erased", props);
     }
 
-    // ----- NEGATIVE: NO DEBE TENER MAS PROPIEDADES -----
+    // ----- NEGATIVE: SHOULD NOT HAVE MORE PROPERTIES -----
 
     [Fact]
     public void ErasbleEntity_ShouldOnlyContainIdAndErased()
@@ -101,7 +101,7 @@ public class ErasbleEntityTests
         Assert.Equal(2, props.Count);
     }
 
-    // ----- MODIFICACIÓN DEL ID HEREDADO -----
+    // ----- MODIFICATION OF INHERITED ID -----
 
     [Fact]
     public void ShouldAllowSettingInheritedId_WhenValid()
@@ -122,7 +122,7 @@ public class ErasbleEntityTests
         Assert.Equal(value, entity.Id);
     }
 
-    // ----- AGGREGATE: ESTADOS COMBINADOS -----
+    // ----- AGGREGATE: COMBINED STATES -----
 
     [Theory]
     [InlineData(1, true)]

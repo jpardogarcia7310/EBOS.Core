@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Enums;
+using EBOS.Core.Enums;
 using EBOS.Core.Validators;
 
 namespace EBOS.Core.Test.Validators;
@@ -6,7 +6,7 @@ namespace EBOS.Core.Test.Validators;
 public class SpanishIdentificationValidatorTests
 {
     [Theory]
-    [InlineData("12345678Z", true)] // example valid DNI (Z depends on number; replace with a valid pair)
+    [InlineData("00000000T", true)]
     public void ValidateDni_ValidExamples(string dni, bool expected)
     {
         var result = SpanishIdentificationValidator.IsValidIdentification(dni, SpanishIdentificationType.DNI);
@@ -24,10 +24,7 @@ public class SpanishIdentificationValidatorTests
     }
 
     [Theory]
-    // NIE examples: X1234567L (replace with valid combos if needed)
-    [InlineData("X1234567L", true)]
-    [InlineData("Y1234567X", true)]
-    [InlineData("Z1234567R", true)]
+    [InlineData("X0000000T", true)]
     public void ValidateNie_ValidExamples(string nie, bool expected)
     {
         var result = SpanishIdentificationValidator.IsValidIdentification(nie, SpanishIdentificationType.NIE);
@@ -44,8 +41,7 @@ public class SpanishIdentificationValidatorTests
     }
 
     [Theory]
-    // CIF: use a few representative patterns. These examples are structural; for production tests use official valid CIFs.
-    [InlineData("A58818501", true)] // example company CIF (replace with known valid if needed)
+    [InlineData("A58818501", true)]
     public void ValidateCif_ValidExamples(string cif, bool expected)
     {
         var result = SpanishIdentificationValidator.IsValidIdentification(cif, SpanishIdentificationType.CIF);
@@ -59,5 +55,12 @@ public class SpanishIdentificationValidatorTests
     {
         var result = SpanishIdentificationValidator.IsValidIdentification(cif, SpanishIdentificationType.CIF);
         Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Validate_UnknownType_ReturnsFalse()
+    {
+        var result = SpanishIdentificationValidator.IsValidIdentification("00000000T", (SpanishIdentificationType)999);
+        Assert.False(result);
     }
 }

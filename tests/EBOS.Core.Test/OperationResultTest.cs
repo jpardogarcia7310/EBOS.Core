@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Primitives;
+using EBOS.Core.Primitives;
 using EBOS.Core.Primitives.Interfaces;
 using System.Collections.ObjectModel;
 
@@ -38,12 +38,35 @@ public class OperationResultTests
     }
 
     [Fact]
+    public void AddError_ByObject_ThrowsOnNull()
+    {
+        var op = new OperationResult<string>();
+        Assert.Throws<ArgumentNullException>(() => op.AddError(null!));
+    }
+
+    [Fact]
     public void AddErrors_AddsMultiple()
     {
         var op = new OperationResult<object>();
         var list = new[] { new ErrorResult("a", 1), new ErrorResult("b", 2) };
         op.AddErrors(list);
         Assert.Equal(2, op.Errors.Count);
+    }
+
+    [Fact]
+    public void AddErrors_ThrowsOnNull()
+    {
+        var op = new OperationResult<object>();
+        Assert.Throws<ArgumentNullException>(() => op.AddErrors(null!));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void AddError_ByComponents_ThrowsOnInvalidMessage(string message)
+    {
+        var op = new OperationResult<object>();
+        Assert.Throws<ArgumentException>(() => op.AddError(message, 1, null));
     }
 
     [Fact]
@@ -57,6 +80,13 @@ public class OperationResultTests
         Assert.Equal(-5, e.Code);
         Assert.Contains("boom", e.Message);
         Assert.NotNull(e.ExceptionMsg);
+    }
+
+    [Fact]
+    public void AddException_ThrowsOnNull()
+    {
+        var op = new OperationResult<object>();
+        Assert.Throws<ArgumentNullException>(() => op.AddException(null!));
     }
 
     [Fact]
@@ -92,5 +122,16 @@ public class OperationResultTests
         Assert.Equal(2, col.Count);
         // original remains unchanged
         Assert.Single(op.Errors);
+    }
+
+    [Fact]
+    public void ToReadOnlyCollection_ReturnsReadOnlyCopy()
+    {
+        var op = new OperationResult<int>();
+        op.AddError("a", 1);
+        var col = op.ToReadOnlyCollection();
+
+        Assert.True(((ICollection<IErrorResult>)col).IsReadOnly);
+        Assert.Single(col);
     }
 }

@@ -1,30 +1,30 @@
-﻿using System.Net.Security;
+using System.Net.Security;
 
 namespace EBOS.Core.Mail;
 
 /// <summary>
-/// Opciones para configurar el SmtpClient creado por la fábrica.
+/// Options to configure the SmtpClient created by the factory.
 /// </summary>
 public sealed class SmtpClientOptions
 {
     /// <summary>
-    /// Timeout en milisegundos. Si es null, se usa el valor por defecto del cliente.
+    /// Timeout in milliseconds. When null, the client default is used.
     /// </summary>
     public int? TimeoutMilliseconds { get; set; }
 
     /// <summary>
-    /// Callback para validar el certificado del servidor. Si es null, se usa la validación por defecto.
+    /// Callback to validate the server certificate. When null, the default validation is used.
     /// </summary>
     public RemoteCertificateValidationCallback? ServerCertificateValidationCallback { get; set; }
 
     /// <summary>
-    /// Permite indicar si se debe ignorar la validación del certificado (no recomendado en producción).
-    /// Si se establece a true, se asigna un callback que siempre devuelve true.
+    /// Indicates whether certificate validation should be ignored (not recommended in production).
+    /// When true, a callback that always returns true is assigned.
     /// </summary>
     public bool IgnoreCertificateValidation { get; set; }
 
     /// <summary>
-    /// Crea una instancia con valores por defecto.
+    /// Creates an instance with default values.
     /// </summary>
     public static SmtpClientOptions Default() => new();
 }

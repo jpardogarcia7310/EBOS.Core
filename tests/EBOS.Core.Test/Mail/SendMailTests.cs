@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Mail;
+using EBOS.Core.Mail;
 using EBOS.Core.Mail.Dto;
 using MimeKit;
 using System.Reflection;
@@ -7,19 +7,87 @@ namespace EBOS.Core.Test.Mail;
 
 public class SendMailTests
 {
-    // Helpers para crear DTOs válidos de base
+    // Helpers to create valid DTOs.
+    private sealed class ThrowingSmtpClientAdapter(Exception? onConnect = null, Exception? onAuthenticate = null, Exception? onSend = null, Exception? onDisconnect = null) : ISmtpClientAdapter
+    {
+        private readonly Exception? _onConnect = onConnect;
+        private readonly Exception? _onAuthenticate = onAuthenticate;
+        private readonly Exception? _onSend = onSend;
+        private readonly Exception? _onDisconnect = onDisconnect;
+
+        public Task ConnectAsync(string host, int port, bool useSsl, CancellationToken cancellationToken = default)
+        {
+            if (_onConnect is not null) throw _onConnect;
+            return Task.CompletedTask;
+        }
+
+        public Task AuthenticateAsync(string userName, string password, CancellationToken cancellationToken = default)
+        {
+            if (_onAuthenticate is not null) throw _onAuthenticate;
+            return Task.CompletedTask;
+        }
+
+        public Task SendAsync(MimeMessage message, CancellationToken cancellationToken = default)
+        {
+            if (_onSend is not null) throw _onSend;
+            return Task.CompletedTask;
+        }
+
+        public Task DisconnectAsync(bool quit, CancellationToken cancellationToken = default)
+        {
+            if (_onDisconnect is not null) throw _onDisconnect;
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class ThrowingSmtpClientFactory(ISmtpClientAdapter adapter) : ISmtpClientFactory
+    {
+        private readonly ISmtpClientAdapter _adapter = adapter;
+        public ISmtpClientAdapter Create() => _adapter;
+        public ISmtpClientAdapter Create(SmtpClientOptions? options) => _adapter;
+    }
+
+    private sealed class TestProtocolException(string message) : MailKit.ProtocolException(message)
+    {
+    }
+
+    private static MailKit.Net.Smtp.SmtpCommandException CreateSmtpCommandException()
+    {
+        var type = typeof(MailKit.Net.Smtp.SmtpCommandException);
+        var ctor = type
+            .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .OrderBy(c => c.GetParameters().Length)
+            .First();
+
+        var args = ctor
+            .GetParameters()
+            .Select(p => p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null)
+            .ToArray();
+
+        return (MailKit.Net.Smtp.SmtpCommandException)ctor.Invoke(args);
+    }
 
     private static MailMessageDto CreateBaseMessage()
     {
         var dto = new MailMessageDto
         {
-            Subject = "Asunto",
-            Message = "Cuerpo",
-            BodyType = "plain" // o el valor que uses en tu código
+            Subject = "Subject",
+            Message = "Body",
+            BodyType = "plain" // or the value used in your code
         };
 
-        dto.FromAddress.Add(new MailAddressDto("Remitente", "remitente@dominio.com"));
-        dto.ToAddress.Add(new MailAddressDto("Destinatario", "destinatario@dominio.com"));
+        dto.FromAddress.Add(new MailAddressDto("Sender", "sender@domain.com"));
+        dto.ToAddress.Add(new MailAddressDto("Recipient", "recipient@domain.com"));
 
         return dto;
     }
@@ -28,11 +96,11 @@ public class SendMailTests
     {
         return new MailSettingsDto
         {
-            Server = "smtp.servidor.com",
+            Server = "smtp.server.com",
             Port = 587,
             HasSSL = true,
             SendMail = sendMail,
-            MailUser = withUser ? "user@dominio.com" : string.Empty,
+            MailUser = withUser ? "user@domain.com" : string.Empty,
             MailPassword = withUser ? "pwd" : string.Empty
         };
     }
@@ -49,20 +117,20 @@ public class SendMailTests
         var messageDto = new MailMessageDto
         {
             Subject = subject,
-            Message = "Cuerpo",
+            Message = "Body",
             BodyType = "plain"
         };
 
-        messageDto.FromAddress.Add(new MailAddressDto("Remitente", "remitente@dominio.com"));
-        messageDto.ToAddress.Add(new MailAddressDto("Destinatario", "destinatario@dominio.com"));
+        messageDto.FromAddress.Add(new MailAddressDto("Sender", "sender@domain.com"));
+        messageDto.ToAddress.Add(new MailAddressDto("Recipient", "recipient@domain.com"));
 
         var settings = new MailSettingsDto
         {
-            Server = "smtp.servidor.com",
+            Server = "smtp.server.com",
             Port = 587,
             HasSSL = true,
             SendMail = true,
-            MailUser = "user@dominio.com",
+            MailUser = "user@domain.com",
             MailPassword = "pwd"
         };
 
@@ -85,13 +153,13 @@ public class SendMailTests
         var sut = new SendMail(factory);
         var messageDto = new MailMessageDto
         {
-            Subject = "Asunto con adjunto",
-            Message = "Mensaje con adjunto",
+            Subject = "Subject with attachment",
+            Message = "Message with attachment",
             BodyType = "plain"
         };
 
-        messageDto.FromAddress.Add(new MailAddressDto("Remitente", "remitente@dominio.com"));
-        messageDto.ToAddress.Add(new MailAddressDto("Destinatario", "destinatario@dominio.com"));
+        messageDto.FromAddress.Add(new MailAddressDto("Sender", "sender@domain.com"));
+        messageDto.ToAddress.Add(new MailAddressDto("Recipient", "recipient@domain.com"));
         messageDto.MailAttachment = new MailAttachmentDto
         {
             MediaType = "application/pdf",
@@ -100,11 +168,11 @@ public class SendMailTests
         };
         var settings = new MailSettingsDto
         {
-            Server = "smtp.servidor.com",
+            Server = "smtp.server.com",
             Port = 587,
             HasSSL = true,
             SendMail = true,
-            MailUser = "user@dominio.com",
+            MailUser = "user@domain.com",
             MailPassword = "pwd"
         };
 
@@ -121,16 +189,16 @@ public class SendMailTests
         Assert.NotNull(client.LastMessage);
         var mimeMessage = client.LastMessage!;
 
-        Assert.Equal("Asunto con adjunto", mimeMessage.Subject);
+        Assert.Equal("Subject with attachment", mimeMessage.Subject);
 
         var multipart = Assert.IsType<Multipart>(mimeMessage.Body);
         Assert.Equal("mixed", multipart.ContentType.MediaSubtype);
 
-        // Debe haber 2 partes: cuerpo + adjunto
+        // It should have 2 parts: body + attachment.
         Assert.Equal(2, multipart.Count);
 
         var bodyPart = Assert.IsType<TextPart>(multipart[0]);
-        Assert.Equal("Mensaje con adjunto", bodyPart.Text);
+        Assert.Equal("Message with attachment", bodyPart.Text);
 
         var attachmentPart = Assert.IsType<MimePart>(multipart[1]);
         Assert.Equal("test.pdf", attachmentPart.FileName);
@@ -138,7 +206,7 @@ public class SendMailTests
         Assert.Equal("pdf", attachmentPart.ContentType.MediaSubtype);
     }
 
-    // -------------------------- Parámetros nulos --------------------------
+    // -------------------------- Null parameters --------------------------
 
     [Fact]
     public async Task SendAsync_NullMailMessage_ThrowsArgumentNullException()
@@ -183,7 +251,7 @@ public class SendMailTests
         Assert.False(client.Disposed);
     }
 
-    // -------------------------- Validación From / To --------------------------
+    // -------------------------- From / To validation --------------------------
 
     [Fact]
     public async Task SendAsync_EmptyFromAddress_ThrowsInvalidOperationException()
@@ -193,7 +261,7 @@ public class SendMailTests
         var messageDto = CreateBaseMessage();
         var settings = CreateBaseSettings();
 
-        messageDto.FromAddress.Clear(); // sin remitentes
+        messageDto.FromAddress.Clear(); // no senders
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => sut.SendAsync(messageDto, settings));
@@ -207,13 +275,13 @@ public class SendMailTests
         var messageDto = CreateBaseMessage();
         var settings = CreateBaseSettings();
 
-        messageDto.ToAddress.Clear(); // sin destinatarios
+        messageDto.ToAddress.Clear(); // no recipients
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => sut.SendAsync(messageDto, settings));
     }
 
-    // -------------------------- BodyType por defecto --------------------------
+    // -------------------------- BodyType default --------------------------
 
     [Fact]
     public async Task SendAsync_EmptyBodyType_DefaultsToPlainText()
@@ -223,7 +291,7 @@ public class SendMailTests
         var messageDto = CreateBaseMessage();
         var settings = CreateBaseSettings();
 
-        messageDto.BodyType = string.Empty; // forzamos vacío
+        messageDto.BodyType = string.Empty; // force empty
 
         await sut.SendAsync(messageDto, settings);
 
@@ -237,7 +305,7 @@ public class SendMailTests
         Assert.Equal("text/plain", body.ContentType.MimeType);
     }
 
-    // -------------------------- Validación de adjunto --------------------------
+    // -------------------------- Attachment validation --------------------------
 
     [Fact]
     public async Task SendAsync_AttachmentWithNullContent_ThrowsInvalidOperationException()
@@ -250,7 +318,7 @@ public class SendMailTests
         {
             MediaType = "application/pdf",
             FileName = "test.pdf",
-            Content = null! // null intencionado
+            Content = null! // intentional null
         };
 
         var settings = CreateBaseSettings();
@@ -319,7 +387,7 @@ public class SendMailTests
             () => sut.SendAsync(messageDto, settings));
     }
 
-    // -------------------------- Flujo SMTP completo --------------------------
+    // -------------------------- Full SMTP flow --------------------------
 
     [Fact]
     public async Task SendAsync_ValidMessageAndSettings_CallsAllSmtpOperations()
@@ -365,7 +433,7 @@ public class SendMailTests
         Assert.True(client.DisconnectCalled);
     }
 
-    // -------------------------- Mapeo MimeMessage (sin adjunto / con adjunto) --------------------------
+    // -------------------------- MimeMessage mapping (without / with attachment) --------------------------
 
     [Fact]
     public void CreateMessage_WithoutAttachment_MapsFieldsCorrectly()
@@ -379,7 +447,7 @@ public class SendMailTests
 
         Assert.NotNull(method);
 
-        // Invoke devuelve (MimeMessage, List<IDisposable>)
+        // Invoke returns (MimeMessage, List<IDisposable>)
         var result = ((MimeMessage, List<IDisposable>))method!.Invoke(null, new object[] { messageDto })!;
 
         var mimeMessage = result.Item1;
@@ -390,25 +458,25 @@ public class SendMailTests
             // From
             Assert.Single(mimeMessage.From);
             var from = (MailboxAddress)mimeMessage.From[0];
-            Assert.Equal("Remitente", from.Name);
-            Assert.Equal("remitente@dominio.com", from.Address);
+            Assert.Equal("Sender", from.Name);
+            Assert.Equal("sender@domain.com", from.Address);
 
             // To
             Assert.Single(mimeMessage.To);
             var to = (MailboxAddress)mimeMessage.To[0];
-            Assert.Equal("Destinatario", to.Name);
-            Assert.Equal("destinatario@dominio.com", to.Address);
+            Assert.Equal("Recipient", to.Name);
+            Assert.Equal("recipient@domain.com", to.Address);
 
             // Subject
-            Assert.Equal("Asunto", mimeMessage.Subject);
+            Assert.Equal("Subject", mimeMessage.Subject);
 
             // Body
             var body = Assert.IsType<TextPart>(mimeMessage.Body);
-            Assert.Equal("Cuerpo", body.Text);
+            Assert.Equal("Body", body.Text);
         }
         finally
         {
-            // Liberar recursos auxiliares devueltos por CreateMessage
+            // Release helper resources returned by CreateMessage.
             if (disposables != null)
             {
                 foreach (var d in disposables)
@@ -417,8 +485,8 @@ public class SendMailTests
                 }
             }
 
-            // Dispose del MimeMessage si implementa IDisposable (MimeMessage no implementa IDisposable,
-            // pero si tu CreateMessage devuelve objetos que requieren dispose, ya los hemos liberado).
+            // Dispose MimeMessage if it implements IDisposable (MimeMessage does not implement it,
+            // but if CreateMessage returns disposable objects, they are already released).
         }
     }
 
@@ -427,8 +495,8 @@ public class SendMailTests
     {
         var messageDto = CreateBaseMessage();
 
-        messageDto.Subject = "Asunto con adjunto";
-        messageDto.Message = "Mensaje con adjunto";
+        messageDto.Subject = "Subject with attachment";
+        messageDto.Message = "Message with attachment";
         messageDto.BodyType = "plain";
         messageDto.MailAttachment = new MailAttachmentDto
         {
@@ -450,14 +518,14 @@ public class SendMailTests
 
         try
         {
-            Assert.Equal("Asunto con adjunto", mimeMessage.Subject);
+            Assert.Equal("Subject with attachment", mimeMessage.Subject);
 
             var multipart = Assert.IsType<Multipart>(mimeMessage.Body);
             Assert.Equal("mixed", multipart.ContentType.MediaSubtype);
             Assert.Equal(2, multipart.Count);
 
             var bodyPart = Assert.IsType<TextPart>(multipart[0]);
-            Assert.Equal("Mensaje con adjunto", bodyPart.Text);
+            Assert.Equal("Message with attachment", bodyPart.Text);
 
             var attachmentPart = Assert.IsType<MimePart>(multipart[1]);
             Assert.Equal("test.pdf", attachmentPart.FileName);
@@ -473,7 +541,8 @@ public class SendMailTests
             }
         }
     }
-    // -------------------------- Wiring del constructor por defecto --------------------------
+
+    // -------------------------- Default constructor wiring --------------------------
 
     [Fact]
     public void DefaultConstructor_UsesMailKitSmtpClientFactory()
@@ -488,5 +557,58 @@ public class SendMailTests
 
         Assert.NotNull(value);
         Assert.IsType<MailKitSmtpClientFactory>(value);
+    }
+
+    // -------------------------- SMTP error handling --------------------------
+
+    [Fact]
+    public async Task SendAsync_WhenSmtpCommandException_ThrowsInvalidOperationException()
+    {
+        var adapter = new ThrowingSmtpClientAdapter(onSend: CreateSmtpCommandException());
+        var factory = new ThrowingSmtpClientFactory(adapter);
+        var sut = new SendMail(factory);
+        var messageDto = CreateBaseMessage();
+        var settings = CreateBaseSettings(sendMail: true, withUser: false);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SendAsync(messageDto, settings));
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenProtocolException_ThrowsInvalidOperationException()
+    {
+        var adapter = new ThrowingSmtpClientAdapter(
+            onSend: new TestProtocolException("protocol fail"));
+        var factory = new ThrowingSmtpClientFactory(adapter);
+        var sut = new SendMail(factory);
+        var messageDto = CreateBaseMessage();
+        var settings = CreateBaseSettings(sendMail: true, withUser: false);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SendAsync(messageDto, settings));
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenIOException_Rethrows()
+    {
+        var adapter = new ThrowingSmtpClientAdapter(
+            onSend: new IOException("io fail"));
+        var factory = new ThrowingSmtpClientFactory(adapter);
+        var sut = new SendMail(factory);
+        var messageDto = CreateBaseMessage();
+        var settings = CreateBaseSettings(sendMail: true, withUser: false);
+
+        await Assert.ThrowsAsync<IOException>(() => sut.SendAsync(messageDto, settings));
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenOperationCanceledException_Rethrows()
+    {
+        var adapter = new ThrowingSmtpClientAdapter(
+            onSend: new OperationCanceledException("cancel"));
+        var factory = new ThrowingSmtpClientFactory(adapter);
+        var sut = new SendMail(factory);
+        var messageDto = CreateBaseMessage();
+        var settings = CreateBaseSettings(sendMail: true, withUser: false);
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => sut.SendAsync(messageDto, settings));
     }
 }

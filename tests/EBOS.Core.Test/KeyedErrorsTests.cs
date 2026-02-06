@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Primitives;
+using EBOS.Core.Primitives;
 
 namespace EBOS.Core.Test;
 
@@ -27,6 +27,13 @@ public class KeyedErrorsTests
     }
 
     [Fact]
+    public void TryAdd_ThrowsOnNull()
+    {
+        var keyed = new KeyedErrors();
+        Assert.Throws<ArgumentNullException>(() => keyed.TryAdd(null!));
+    }
+
+    [Fact]
     public void AddOrUpdate_ReplacesExisting()
     {
         var keyed = new KeyedErrors
@@ -36,6 +43,13 @@ public class KeyedErrorsTests
         keyed.AddOrUpdate(new ErrorResult("b", 1));
         Assert.Single(keyed);
         Assert.Equal("b", keyed[1].Message);
+    }
+
+    [Fact]
+    public void AddOrUpdate_ThrowsOnNull()
+    {
+        var keyed = new KeyedErrors();
+        Assert.Throws<ArgumentNullException>(() => keyed.AddOrUpdate(null!));
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Extensions;
+using EBOS.Core.Extensions;
 using System.Globalization;
 
 namespace EBOS.Core.Test.Extensions;
@@ -101,7 +101,7 @@ public class IntegerExtensionsTests
     [Fact]
     public void ParseOrDefault_StringWithDecimalPoint_ReturnsDefaultValue()
     {
-        var input = "123.45"; // inválido para int.Parse con InvariantCulture
+        var input = "123.45"; // invalid for int.Parse with InvariantCulture
         int? defaultValue = 100;
         var result = IntegerExtensions.ParseOrDefault(input, defaultValue);
 
@@ -111,7 +111,7 @@ public class IntegerExtensionsTests
     [Fact]
     public void ParseOrDefault_StringWithThousandsSeparatorInvariant_ReturnsDefaultValue()
     {
-        var input = "1,234"; // con InvariantCulture esto no es válido para int.Parse simple
+        var input = "1,234"; // with InvariantCulture this is invalid for int.Parse
         int? defaultValue = 500;
         var result = IntegerExtensions.ParseOrDefault(input, defaultValue);
 
@@ -123,7 +123,7 @@ public class IntegerExtensionsTests
     [Fact]
     public void ParseOrDefault_ValueGreaterThanIntMax_ReturnsDefaultValue()
     {
-        // int.MaxValue + "0" garantiza overflow
+        // int.MaxValue + "0" guarantees overflow
         var input = ((long)int.MaxValue + 1).ToString(CultureInfo.InvariantCulture);
         int? defaultValue = 123;
         var result = IntegerExtensions.ParseOrDefault(input, defaultValue);

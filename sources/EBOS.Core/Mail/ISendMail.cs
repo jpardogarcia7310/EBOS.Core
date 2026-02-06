@@ -1,9 +1,9 @@
-﻿using EBOS.Core.Mail.Dto;
+using EBOS.Core.Mail.Dto;
 
 namespace EBOS.Core.Mail;
 
 /// <summary>
-/// Interfaz mínima para el servicio de envío de correo.
+/// Minimal interface for the mail sending service.
 /// </summary>
 public interface ISendMail
 {

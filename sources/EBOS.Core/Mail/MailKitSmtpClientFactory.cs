@@ -1,4 +1,4 @@
-﻿using MailKit.Net.Smtp;
+using MailKit.Net.Smtp;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Security;
 
@@ -9,14 +9,14 @@ public sealed class MailKitSmtpClientFactory : ISmtpClientFactory
     [SuppressMessage(
         "Reliability",
         "CA2000:Dispose objects before losing scope",
-        Justification = "El SmtpClient se transfiere al adaptador y debe ser desechado por el consumidor.")]
+        Justification = "The SmtpClient is transferred to the adapter and must be disposed by the consumer.")]
     public ISmtpClientAdapter Create()
         => Create(null);
 
     [SuppressMessage(
         "Reliability",
         "CA2000:Dispose objects before losing scope",
-        Justification = "El SmtpClient se transfiere al adaptador y debe ser desechado por el consumidor.")]
+        Justification = "The SmtpClient is transferred to the adapter and must be disposed by the consumer.")]
     public ISmtpClientAdapter Create(SmtpClientOptions? options)
     {
         var client = new SmtpClient();
@@ -28,7 +28,9 @@ public sealed class MailKitSmtpClientFactory : ISmtpClientFactory
 
         if (options?.IgnoreCertificateValidation == true)
         {
+#pragma warning disable CA5359 // Caller explicitly requests disabling certificate validation.
             client.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+#pragma warning restore CA5359
         }
         else if (options?.ServerCertificateValidationCallback is RemoteCertificateValidationCallback callback)
         {

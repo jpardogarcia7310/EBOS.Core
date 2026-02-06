@@ -1,12 +1,12 @@
-﻿using EBOS.Core.Primitives;
+using EBOS.Core.Primitives;
 using EBOS.Core.Primitives.Interfaces;
 using System.Collections.ObjectModel;
 
 namespace EBOS.Core;
 
 /// <summary>
-/// Resultado de operación que puede contener un valor y una colección de errores.
-/// Expone los errores como IReadOnlyCollection para evitar modificaciones externas.
+/// Operation result that can contain a value and an error collection.
+/// Exposes errors as IReadOnlyCollection to prevent external modifications.
 /// </summary>
 public class OperationResult<TResult>
 {

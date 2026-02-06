@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Mail.Dto;
+using EBOS.Core.Mail.Dto;
 
 namespace EBOS.Core.Test.Mail.Dto;
 
@@ -8,8 +8,8 @@ public class MailAddressDtoTests
     public void Ctor_SetsNameAndAddress()
     {
         // Arrange
-        const string name = "Remitente";
-        const string address = "remitente@ejemplo.com";
+        const string name = "Sender";
+        const string address = "sender@example.com";
 
         // Act
         var dto = new MailAddressDto(name, address);

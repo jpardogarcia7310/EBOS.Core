@@ -1,4 +1,4 @@
-﻿using EBOS.Core.BusinessErrors;
+using EBOS.Core.BusinessErrors;
 
 namespace EBOS.Core.Test.BusinessErrors;
 

@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Mail.Dto;
+using EBOS.Core.Mail.Dto;
 
 namespace EBOS.Core.Test.Mail.Dto;
 

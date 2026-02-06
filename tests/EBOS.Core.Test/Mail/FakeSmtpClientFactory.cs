@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Mail;
+using EBOS.Core.Mail;
 
 namespace EBOS.Core.Test.Mail;
 
@@ -9,8 +9,8 @@ public sealed class FakeSmtpClientFactory : ISmtpClientFactory
     public ISmtpClientAdapter Create() => Instance;
     public ISmtpClientAdapter Create(SmtpClientOptions? options)
     {
-        // Las opciones se ignoran en este fake, pero se podrían usar
-        // para simular distintos comportamientos en tests.
+        // Options are ignored in this fake, but they could be used
+        // to simulate different behaviors in tests.
         return new FakeSmtpClientAdapter();
     }
 }

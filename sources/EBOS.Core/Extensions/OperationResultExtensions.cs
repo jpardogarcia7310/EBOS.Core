@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Primitives;
+using EBOS.Core.Primitives;
 
 namespace EBOS.Core.Extensions;
 

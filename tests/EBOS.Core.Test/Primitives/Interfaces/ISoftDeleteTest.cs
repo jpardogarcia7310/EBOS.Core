@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Primitives.Interfaces;
+using EBOS.Core.Primitives.Interfaces;
 
 namespace EBOS.Core.Test.Primitives.Interfaces;
 

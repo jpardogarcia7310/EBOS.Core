@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Enums;
+using EBOS.Core.Enums;
 using System.Globalization;
 
 namespace EBOS.Core.Validators;
@@ -28,27 +28,27 @@ public static class SpanishIdentificationValidator
 
         identification = identification.ToUpperInvariant();
 
-        // Los caracteres 1..7 deben ser dígitos
+        // Characters 1..7 must be digits.
         for (int i = 1; i <= 7; i++)
         {
             if (identification[i] < '0' || identification[i] > '9')
                 return false;
         }
 
-        int sumEven = 0; // posiciones 2,4,6 (índices 2,4,6)
-        int sumOdd = 0;  // posiciones 1,3,5,7 (índices 1,3,5,7) -> doble y sumar dígitos
+        int sumEven = 0; // positions 2, 4, 6 (indices 2, 4, 6)
+        int sumOdd = 0;  // positions 1, 3, 5, 7 (indices 1, 3, 5, 7) -> double and sum digits
 
         for (int i = 1; i <= 7; i++)
         {
             int digit = identification[i] - '0';
             if ((i % 2) == 0)
             {
-                // posición par
+                // even position
                 sumEven += digit;
             }
             else
             {
-                // posición impar: doble y sumar dígitos
+                // odd position: double and sum digits
                 int doubled = digit * 2;
                 sumOdd += (doubled / 10) + (doubled % 10);
             }
@@ -59,12 +59,12 @@ public static class SpanishIdentificationValidator
 
         char controlChar = identification[8];
 
-        // Coincide con dígito de control numérico?
+        // Matches numeric control digit?
         if (controlChar == (char)('0' + controlDigit))
             return true;
 
-        // Coincide con letra de control (tabla estándar)
-        const string controlLetters = "JABCDEFGHI"; // índice = controlDigit
+        // Matches control letter (standard table).
+        const string controlLetters = "JABCDEFGHI"; // index = controlDigit
         if (controlChar == controlLetters[controlDigit])
             return true;
 

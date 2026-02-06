@@ -1,4 +1,4 @@
-﻿using EBOS.Core.Extensions;
+using EBOS.Core.Extensions;
 using System.Globalization;
 
 namespace EBOS.Core.Test.Extensions;

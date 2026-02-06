@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -9,8 +9,9 @@ public static partial class BankAccountValidator
     private static readonly Regex IbanRegex = RegExIban();
 
     /// <summary>
-    /// Valida una cuenta bancaria española construyendo el IBAN a partir del código de país (ibanCode)
-    /// y las partes nacionales. Devuelve true si el IBAN calculado es válido y los dígitos de control nacionales coinciden.
+    /// Validates a Spanish bank account by building the IBAN from the country code (ibanCode)
+    /// and the national parts. Returns true when the calculated IBAN is valid and the national
+    /// control digits match.
     /// </summary>
     public static bool IsValidBankAccount(string ibanCode, string bankCode, string branchCode,
         string accountControl, string accountMiddle, string accountEnd)
@@ -18,54 +19,83 @@ public static partial class BankAccountValidator
         if (string.IsNullOrWhiteSpace(ibanCode))
             return false;
 
-        var country = ibanCode.Trim().ToUpperInvariant();
+        var ibanPart = ibanCode.Trim()
+            .Replace(" ", string.Empty, StringComparison.Ordinal)
+            .Replace("-", string.Empty, StringComparison.Ordinal)
+            .ToUpperInvariant();
 
-        // Actualmente soportamos solo España (ES). Si necesitas otros países, hay que añadir reglas BBAN por país.
+        string country;
+        string? expectedChecksum = null;
+        if (ibanPart.Length == 2)
+        {
+            country = ibanPart;
+        }
+        else if (ibanPart.Length == 4)
+        {
+            country = ibanPart[..2];
+            expectedChecksum = ibanPart.Substring(2, 2);
+        }
+        else
+        {
+            return false;
+        }
+
+        // Only Spain (ES) is supported right now. Add BBAN rules per country for other cases.
         if (country != "ES")
             return false;
 
-        // Normalizar y validar partes nacionales (quitar espacios y guiones)
+        // Normalize and validate national parts (remove spaces and hyphens).
         bankCode = (bankCode ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
         branchCode = (branchCode ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
         accountControl = (accountControl ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
         accountMiddle = (accountMiddle ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
         accountEnd = (accountEnd ?? string.Empty).Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
 
-        // Longitudes esperadas para España
-        if (bankCode.Length != 4 || branchCode.Length != 4 || accountMiddle.Length != 4 || accountEnd.Length != 10)
+        // Expected lengths for Spain.
+        if (bankCode.Length != 4 || branchCode.Length != 4)
             return false;
 
-        if (accountControl.Length != 2 && accountControl.Length != 4)
+        if (accountControl.Length != 2)
             return false;
 
-        // Construir BBAN (para España: bank(4)+branch(4)+control(2)+accountMiddle(4)+accountEnd(10))
-        // Si accountControl tiene 4, sus últimos 2 dígitos forman parte del número de cuenta en el cálculo nacional.
-        string bban = string.Concat(bankCode, branchCode, accountControl.Length >= 4 ? accountControl.Substring(2, 2) : string.Empty, accountMiddle, accountEnd);
+        // Build the bank account (10 digits): accountMiddle(4) + accountEnd(6) or accountEnd(10).
+        string accountNumber;
+        if (accountMiddle.Length == 0 && accountEnd.Length == 10)
+        {
+            accountNumber = accountEnd;
+        }
+        else if (accountMiddle.Length == 4 && accountEnd.Length == 6)
+        {
+            accountNumber = string.Concat(accountMiddle, accountEnd);
+        }
+        else
+        {
+            return false;
+        }
 
-        // Construir IBAN provisional con checksum "00"
-        var provisionalIban = country + "00" + bban;
+        // Build BBAN (Spain: bank(4)+branch(4)+control(2)+account(10)).
+        string bban = string.Concat(bankCode, branchCode, accountControl, accountNumber);
 
-        // Calcular checksum IBAN
-        var numeric = ConvertToIbanNumericString(provisionalIban);
+        // Compute IBAN checksum: move country+checksum to the end before calculating mod 97.
+        var rearranged = bban + country + "00";
+        var numeric = ConvertToIbanNumericString(rearranged);
         var checksum = CalculateIbanChecksum(numeric);
         if (checksum is null)
             return false;
 
         var iban = country + checksum + bban;
+        if (expectedChecksum is not null && !string.Equals(expectedChecksum, checksum, StringComparison.Ordinal))
+            return false;
 
-        // Validar formato IBAN y checksum
+        // Validate IBAN format and checksum.
         if (!IbanRegex.IsMatch(iban))
             return false;
 
         if (!ValidateIbanChecksum(iban))
             return false;
 
-        // Validar dígitos de control nacionales (DC)
-        string controlDigits = accountControl.Length >= 2 ? accountControl[..2] : string.Empty;
-        string accountNumber = accountControl.Length >= 4
-            ? string.Concat(accountControl.Substring(2, 2), accountMiddle, accountEnd)
-            : string.Concat(accountMiddle, accountEnd);
-
+        // Validate national control digits (DC).
+        string controlDigits = accountControl;
         var expectedDc = CalculateAccountControlDigits(bankCode, branchCode, accountNumber);
         if (expectedDc is null)
             return false;
@@ -78,7 +108,7 @@ public static partial class BankAccountValidator
         if (string.IsNullOrEmpty(numericRepresentation))
             return null;
 
-        // Calcular resto módulo 97 de forma iterativa para evitar números grandes
+        // Compute mod 97 iteratively to avoid large numbers.
         var remainder = 0;
         foreach (var ch in numericRepresentation)
         {
@@ -138,9 +168,9 @@ public static partial class BankAccountValidator
         if (fullNumber.Any(ch => ch < '0' || ch > '9'))
             return null;
 
-        // Pesos estándar para España:
-        var weightsOffice = new[] { 4, 8, 5, 10, 9, 7, 3, 6 };       // 8 dígitos (entidad+oficina)
-        var weightsAccount = new[] { 1, 2, 4, 8, 5, 10, 9, 7, 3, 6 }; // 10 dígitos (número de cuenta)
+        // Standard weights for Spain:
+        var weightsOffice = new[] { 4, 8, 5, 10, 9, 7, 3, 6 };       // 8 digits (bank + branch)
+        var weightsAccount = new[] { 1, 2, 4, 8, 5, 10, 9, 7, 3, 6 }; // 10 digits (account number)
 
         var officePart = fullNumber.AsSpan(0, 8);
         var accountPart = fullNumber.AsSpan(8, 10);
@@ -177,7 +207,7 @@ public static partial class BankAccountValidator
 
         return dc1 + dc2;
     }
-    // IBAN general: 2 letras (país) + 2 dígitos (checksum) + BBAN (hasta 30 caracteres)
+    // General IBAN: 2 letters (country) + 2 digits (checksum) + BBAN (up to 30 chars).
 
     [GeneratedRegex("^[A-Z]{2}\\d{2}[A-Z0-9]{11,30}$", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
     private static partial Regex RegExIban();

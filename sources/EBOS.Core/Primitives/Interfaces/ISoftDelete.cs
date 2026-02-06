@@ -1,7 +1,7 @@
-﻿namespace EBOS.Core.Primitives.Interfaces;
+namespace EBOS.Core.Primitives.Interfaces;
 
 /// <summary>
-/// Marca una entidad que soporta borrado lógico.
+/// Marks an entity that supports soft deletion.
 /// </summary>
 public interface ISoftDeletable
 {
