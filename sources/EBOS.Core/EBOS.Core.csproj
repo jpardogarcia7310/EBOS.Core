@@ -13,7 +13,7 @@
 		<Authors>SITECAV</Authors>
 		<Copyright>All rights reserved by SITECAV 2025</Copyright>
 		<PackageTags>Core; Kernel; Primitives; Cryptography; BusinessErrors; Extensions</PackageTags>
-		<PackageReleaseNotes>I've corrected the generic repository interface IRepository so that the GetAll methods of all repositories return a read-only collection of the entity in question.</PackageReleaseNotes>
+		<PackageReleaseNotes>Corrected the generic repository interface IRepository so that the GetAll methods of all repositories return a read-only collection of the entity in question.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		
 		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
@@ -36,22 +36,13 @@
 	</PropertyGroup>
 
     <ItemGroup>
-      <None Remove=".gitignore" />
+      <Compile Remove="Configurations\**" />
+      <EmbeddedResource Remove="Configurations\**" />
+      <None Remove="Configurations\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="..\..\documentation\Images\Logo_EBOS_128.png">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
-      <None Include="..\..\LICENSE">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
-      <None Include="..\..\README.md">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
+      <None Remove=".gitignore" />
     </ItemGroup>
 
     <ItemGroup>
@@ -67,8 +58,4 @@
 	<ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
 		<PackageReference Include="System.Runtime.Caching" Version="10.0.0" />
 	</ItemGroup>
-
-	<ItemGroup>
-      <Folder Include="Configurations\" />
-    </ItemGroup>
 </Project>
